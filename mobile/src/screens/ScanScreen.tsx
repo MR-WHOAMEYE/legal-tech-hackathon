@@ -79,7 +79,7 @@ const ScanScreen = ({ navigation }: any) => {
                     <View style={styles.topBar}>
                         <View style={styles.brandRow}>
                             <ShieldCheck size={20} color="#ff4103" />
-                            <Text style={styles.brandText}>TrustPass Scanner</Text>
+                            <Text style={styles.brandText}>BizBlock Scanner</Text>
                         </View>
                         <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
                             <X color="#FFFFFF" size={20} />

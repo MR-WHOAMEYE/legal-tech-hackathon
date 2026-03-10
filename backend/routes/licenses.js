@@ -8,7 +8,15 @@ const router = express.Router();
 // 1. REGISTER LICENSE (Regulator Only)
 router.post('/register', [auth, requireRole('regulator')], async (req, res) => {
     try {
-        const { licenseId, licenseType, businessName, holderAddress, expiryDate, documentHash } = req.body;
+        let { licenseId, licenseType, businessName, holderAddress, expiryDate, documentHash } = req.body;
+        
+        if (holderAddress && !holderAddress.startsWith('0x')) {
+            holderAddress = '0x' + holderAddress;
+        }
+        if (!ethers.isAddress(holderAddress)) {
+            return res.status(400).json({ error: 'Invalid Holder Wallet Address. Ensure it is a valid hex address.' });
+        }
+
         const contract = getContract();
 
         if (!contract) return res.status(500).json({ error: 'Blockchain contract not initialized' });

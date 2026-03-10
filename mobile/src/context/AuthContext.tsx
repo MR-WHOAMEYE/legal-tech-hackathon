@@ -16,6 +16,7 @@ interface AuthContextType {
     token: string | null;
     isLoading: boolean;
     login: (email: string, password: string) => Promise<void>;
+    loginWithWallet: (walletAddress: string) => Promise<void>;
     register: (data: any) => Promise<void>;
     logout: () => Promise<void>;
 }
@@ -25,6 +26,7 @@ export const AuthContext = createContext<AuthContextType>({
     token: null,
     isLoading: true,
     login: async () => {},
+    loginWithWallet: async () => {},
     register: async () => {},
     logout: async () => {}
 });
@@ -68,6 +70,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
+    const loginWithWallet = async (walletAddress: string) => {
+        setIsLoading(true);
+        try {
+            const res = await authApi.loginWithWallet(walletAddress);
+            const { token: newToken, user: newUser } = res.data;
+            await AsyncStorage.setItem('token', newToken);
+            await AsyncStorage.setItem('user', JSON.stringify(newUser));
+            setToken(newToken);
+            setUser(newUser);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const register = async (data: any) => {
         setIsLoading(true);
         try {
@@ -92,7 +108,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, isLoading, login, register, logout }}>
+        <AuthContext.Provider value={{ user, token, isLoading, login, loginWithWallet, register, logout }}>
             {children}
         </AuthContext.Provider>
     );

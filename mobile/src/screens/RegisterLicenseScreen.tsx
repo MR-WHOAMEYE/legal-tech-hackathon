@@ -1,8 +1,16 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, ScrollView, Platform, KeyboardAvoidingView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, ScrollView, Platform, KeyboardAvoidingView, Modal, FlatList } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { licenseApi } from '../services/api';
 import { Hash, Building2, UserCircle, Calendar, HashIcon, FileSignature, ChevronLeft } from 'lucide-react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+
+const LICENSE_TYPES = [
+    { id: '1', label: 'GST Registration', value: 'GST' },
+    { id: '2', label: 'Trade License', value: 'Trade License' },
+    { id: '3', label: 'FSSAI Permit', value: 'FSSAI' },
+    { id: '4', label: 'Incorporation Certificate', value: 'Incorporation' },
+];
 
 const RegisterLicenseScreen = ({ navigation }: any) => {
     const [isLoading, setIsLoading] = useState(false);
@@ -12,6 +20,8 @@ const RegisterLicenseScreen = ({ navigation }: any) => {
     const [holderAddress, setHolderAddress] = useState('');
     const [expiryDate, setExpiryDate] = useState('');
     const [documentHash, setDocumentHash] = useState('');
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [showTypeDropdown, setShowTypeDropdown] = useState(false);
 
     const handleSubmit = async () => {
         if (!licenseId || !licenseType || !businessName || !holderAddress || !expiryDate || !documentHash) {
@@ -26,8 +36,19 @@ const RegisterLicenseScreen = ({ navigation }: any) => {
                 setIsLoading(false);
                 return;
             }
+
+            let formattedAddress = holderAddress.trim();
+            if (!formattedAddress.startsWith('0x')) {
+                formattedAddress = '0x' + formattedAddress;
+            }
+            if (formattedAddress.length !== 42) {
+                Alert.alert("Invalid Address", "Holder Wallet Address must be a 42-character valid hex address.");
+                setIsLoading(false);
+                return;
+            }
+
             await licenseApi.register({
-                licenseId, licenseType, businessName, holderAddress,
+                licenseId, licenseType, businessName, holderAddress: formattedAddress,
                 expiryDate: expDate.toISOString(), documentHash
             });
             Alert.alert("Success", "License registered to the blockchain securely.");
@@ -40,12 +61,12 @@ const RegisterLicenseScreen = ({ navigation }: any) => {
     };
 
     const fields = [
-        { icon: <Hash color="#0c4651" size={18} />, placeholder: 'License ID (e.g. GST-12345)', value: licenseId, setter: setLicenseId },
-        { icon: <FileSignature color="#0c4651" size={18} />, placeholder: 'License Type (GST, Trade, FSSAI)', value: licenseType, setter: setLicenseType },
-        { icon: <Building2 color="#0c4651" size={18} />, placeholder: 'Business Name', value: businessName, setter: setBusinessName },
-        { icon: <UserCircle color="#0c4651" size={18} />, placeholder: 'Holder Wallet Address (0x...)', value: holderAddress, setter: setHolderAddress },
-        { icon: <Calendar color="#0c4651" size={18} />, placeholder: 'Expiry Date (YYYY-MM-DD)', value: expiryDate, setter: setExpiryDate },
-        { icon: <HashIcon color="#0c4651" size={18} />, placeholder: 'Document Hash (IPFS CID / SHA256)', value: documentHash, setter: setDocumentHash },
+        { key: 'licenseId', icon: <Hash color="#0c4651" size={18} />, placeholder: 'License ID (e.g. GST-12345)', value: licenseId, setter: setLicenseId },
+        { key: 'type', icon: <FileSignature color="#0c4651" size={18} />, placeholder: 'License Type (Tap to select)', value: licenseType, setter: setLicenseType, isTypeDropdown: true },
+        { key: 'business', icon: <Building2 color="#0c4651" size={18} />, placeholder: 'Business Name', value: businessName, setter: setBusinessName },
+        { key: 'address', icon: <UserCircle color="#0c4651" size={18} />, placeholder: 'Holder Wallet Address (0x...)', value: holderAddress, setter: setHolderAddress },
+        { key: 'date', icon: <Calendar color="#0c4651" size={18} />, placeholder: 'Expiry Date (Tap to select)', value: expiryDate, setter: setExpiryDate, isDate: true },
+        { key: 'hash', icon: <HashIcon color="#0c4651" size={18} />, placeholder: 'Document Hash (IPFS CID / SHA256)', value: documentHash, setter: setDocumentHash },
     ];
 
     return (
@@ -68,17 +89,88 @@ const RegisterLicenseScreen = ({ navigation }: any) => {
                     <View style={styles.formCard}>
                         <LinearGradient colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.02)']} style={styles.formGradient}>
                             {fields.map((f, i) => (
-                                <View key={i} style={styles.inputGroup}>
+                                <View key={f.key} style={styles.inputGroup}>
                                     <View style={styles.inputIconBox}>{f.icon}</View>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder={f.placeholder}
-                                        placeholderTextColor="#475569"
-                                        value={f.value}
-                                        onChangeText={f.setter}
-                                    />
+                                    
+                                    {f.isDate ? (
+                                        <TouchableOpacity 
+                                            style={{ flex: 1, justifyContent: 'center' }} 
+                                            onPress={() => setShowDatePicker(true)}
+                                            activeOpacity={0.7}
+                                        >
+                                            <Text style={[styles.input, { textAlignVertical: 'center', paddingTop: 14, color: f.value ? '#E2E8F0' : '#475569' }]}>
+                                                {f.value || f.placeholder}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    ) : f.isTypeDropdown ? (
+                                        <TouchableOpacity 
+                                            style={{ flex: 1, justifyContent: 'center' }} 
+                                            onPress={() => setShowTypeDropdown(true)}
+                                            activeOpacity={0.7}
+                                        >
+                                            <Text style={[styles.input, { textAlignVertical: 'center', paddingTop: 14, color: f.value ? '#E2E8F0' : '#475569' }]}>
+                                                {f.value || f.placeholder}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    ) : (
+                                        <TextInput
+                                            style={styles.input}
+                                            placeholder={f.placeholder}
+                                            placeholderTextColor="#475569"
+                                            value={f.value}
+                                            onChangeText={f.setter}
+                                        />
+                                    )}
                                 </View>
                             ))}
+
+                            {/* Date Picker Modal */}
+                            {showDatePicker && (
+                                <DateTimePicker
+                                    value={expiryDate ? new Date(expiryDate) : new Date()}
+                                    mode="date"
+                                    display="default"
+                                    onChange={(event, selectedDate) => {
+                                        setShowDatePicker(false);
+                                        if (selectedDate) {
+                                            setExpiryDate(selectedDate.toISOString().split('T')[0]);
+                                        }
+                                    }}
+                                />
+                            )}
+
+                            {/* License Type Dropdown Modal */}
+                            <Modal
+                                visible={showTypeDropdown}
+                                transparent={true}
+                                animationType="fade"
+                                onRequestClose={() => setShowTypeDropdown(false)}
+                            >
+                                <TouchableOpacity 
+                                    style={styles.modalOverlay} 
+                                    activeOpacity={1} 
+                                    onPress={() => setShowTypeDropdown(false)}
+                                >
+                                    <View style={styles.dropdownContainer}>
+                                        <Text style={styles.dropdownTitle}>Select License Type</Text>
+                                        <FlatList
+                                            data={LICENSE_TYPES}
+                                            keyExtractor={(item) => item.id}
+                                            renderItem={({ item }) => (
+                                                <TouchableOpacity 
+                                                    style={styles.dropdownItem}
+                                                    onPress={() => {
+                                                        setLicenseType(item.value);
+                                                        setShowTypeDropdown(false);
+                                                    }}
+                                                >
+                                                    <Text style={styles.dropdownItemText}>{item.label}</Text>
+                                                </TouchableOpacity>
+                                            )}
+                                        />
+                                    </View>
+                                </TouchableOpacity>
+                            </Modal>
 
                             <TouchableOpacity onPress={handleSubmit} disabled={isLoading} activeOpacity={0.8}>
                                 <LinearGradient colors={['#cc3200', '#ff4103']} style={styles.submitButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
@@ -129,6 +221,45 @@ const styles = StyleSheet.create({
         borderRadius: 14, height: 54, justifyContent: 'center', alignItems: 'center', marginTop: 8,
     },
     submitText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700', letterSpacing: 0.3 },
+    
+    // Modal Styles
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        justifyContent: 'center',
+        padding: 24,
+    },
+    dropdownContainer: {
+        backgroundColor: '#011e2d',
+        borderRadius: 16,
+        paddingVertical: 16,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.5,
+        shadowRadius: 16,
+        elevation: 10,
+    },
+    dropdownTitle: {
+        color: '#94A3B8',
+        fontSize: 14,
+        fontWeight: '700',
+        paddingHorizontal: 20,
+        paddingBottom: 12,
+        marginBottom: 8,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(255,255,255,0.05)',
+    },
+    dropdownItem: {
+        paddingVertical: 14,
+        paddingHorizontal: 20,
+    },
+    dropdownItemText: {
+        color: '#F1F5F9',
+        fontSize: 16,
+        fontWeight: '500',
+    }
 });
 
 export default RegisterLicenseScreen;

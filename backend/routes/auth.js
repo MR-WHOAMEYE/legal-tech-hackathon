@@ -12,7 +12,7 @@ const isValidRole = (role) => ['regulator', 'business', 'verifier'].includes(rol
 
 router.post('/register', async (req, res) => {
     try {
-        const { email, password, role, businessName } = req.body;
+        const { email, password, role, businessName, walletAddress } = req.body;
 
         if (!email || !password || !role || !isValidRole(role)) {
             return res.status(400).json({ error: 'Missing or invalid fields (email, password, role)' });
@@ -23,10 +23,13 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ error: 'User already exists' });
         }
 
-        // Generate a valid Ethereum wallet address for the user (we don't give them the private key here,
-        // it's just for their identity on the platform/chain).
-        // For regulators, we can assign a known Hardhat account if needed, but random is fine for POC.
-        const randomWallet = ethers.Wallet.createRandom();
+        // Use the provided wallet address from the frontend (if they connected MetaMask),
+        // Otherwise, generate a random one for them as a fallback for the POC.
+        let finalWalletAddress = walletAddress;
+        if (!finalWalletAddress) {
+            const randomWallet = ethers.Wallet.createRandom();
+            finalWalletAddress = randomWallet.address;
+        }
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
@@ -35,7 +38,7 @@ router.post('/register', async (req, res) => {
             email,
             password: hashedPassword,
             role,
-            walletAddress: randomWallet.address,
+            walletAddress: finalWalletAddress,
             businessName: role === 'business' ? businessName : undefined
         });
 
@@ -88,6 +91,54 @@ router.post('/login', async (req, res) => {
     } catch (err) {
         console.error("Login error:", err);
         res.status(500).json({ error: 'Server error during login' });
+    }
+});
+
+// MetaMask / Web3 Wallet Login Endpoint
+router.post('/login/wallet', async (req, res) => {
+    try {
+        const { walletAddress } = req.body;
+
+        if (!walletAddress) {
+            return res.status(400).json({ error: 'Missing walletAddress' });
+        }
+
+        // Ideally, in a real app, we'd verify a cryptographic signature here (EIP-4361).
+        // For the hackathon POC, we'll just check if the wallet exists.
+        // If it doesn't exist, we can create a default 'verifier' account for them.
+        
+        let user = await User.findOne({ walletAddress: new RegExp('^' + walletAddress + '$', 'i') });
+        
+        if (!user) {
+            // Auto-register as verifier if wallet not found
+            const newUser = new User({
+                email: `${walletAddress.substring(0,8)}@wallet.local`, 
+                password: await bcrypt.hash(walletAddress, 10), // Dummy password
+                role: 'verifier',
+                walletAddress: walletAddress.toLowerCase() // normalize
+            });
+            await newUser.save();
+            user = newUser;
+        }
+
+        // Generate Token
+        const payload = {
+            id: user._id,
+            email: user.email,
+            role: user.role,
+            walletAddress: user.walletAddress
+        };
+
+        const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+
+        res.json({
+            token,
+            user: payload
+        });
+
+    } catch (err) {
+        console.error("Wallet login error:", err);
+        res.status(500).json({ error: 'Server error during wallet login' });
     }
 });
 

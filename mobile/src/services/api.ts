@@ -26,6 +26,7 @@ api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
 
 export const authApi = {
     login: (email: string, password: string) => api.post('/auth/login', { email, password }),
+    loginWithWallet: (walletAddress: string) => api.post('/auth/login/wallet', { walletAddress }),
     register: (data: any) => api.post('/auth/register', data)
 };
 

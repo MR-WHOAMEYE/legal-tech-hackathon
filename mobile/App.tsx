@@ -1,7 +1,22 @@
+import '@walletconnect/react-native-compat';
 import React, { useContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthProvider, AuthContext } from './src/context/AuthContext';
+import { WalletConnectModal } from '@walletconnect/modal-react-native';
+
+// WalletConnect Configuration
+const projectId = process.env.EXPO_PUBLIC_WALLETCONNECT_PROJECT_ID || '9d1aa65ee79697a2f04506a01a0e911e';
+const providerMetadata = {
+  name: 'BizBlock (Local)',
+  description: 'Local development environment for BizBlock',
+  url: 'http://localhost:8081',
+  icons: ['https://walletconnect.org/walletconnect-logo.png'],
+  redirect: {
+    native: 'trustpass://',
+    universal: 'http://localhost:8081'
+  }
+};
 
 // Screens
 import LoginScreen from './src/screens/LoginScreen';
@@ -55,6 +70,10 @@ export default function App() {
     return (
         <AuthProvider>
             <AppNavigator />
+            <WalletConnectModal
+              projectId={projectId}
+              providerMetadata={providerMetadata}
+            />
         </AuthProvider>
     );
 }

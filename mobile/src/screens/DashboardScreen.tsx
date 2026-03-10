@@ -1,8 +1,10 @@
 import React, { useContext, useRef, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Animated, Easing } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Animated, Easing, Alert, Platform, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AuthContext } from '../context/AuthContext';
 import { ShieldCheck, PlusCircle, LayoutList, Scan, FileSearch, LogOut, CheckCircle2, Fingerprint, Shield } from 'lucide-react-native';
+import { useWalletConnectModal } from '@walletconnect/modal-react-native';
+import * as Clipboard from 'expo-clipboard';
 
 const DashboardCard = ({ title, subtitle, icon, onPress, colors, delay = 0 }: {
     title: string, subtitle?: string, icon: any, onPress: () => void, colors: string[], delay?: number
@@ -39,6 +41,18 @@ const DashboardCard = ({ title, subtitle, icon, onPress, colors, delay = 0 }: {
 
 const DashboardScreen = ({ navigation }: any) => {
     const { user, logout } = useContext(AuthContext);
+    const { provider, isConnected } = useWalletConnectModal();
+
+    const handleLogout = async () => {
+        if (isConnected && provider) {
+            try {
+                await provider.disconnect();
+            } catch (err) {
+                console.log("WalletConnect disconnect error", err);
+            }
+        }
+        await logout();
+    };
 
     const renderRoleContent = () => {
         if (!user) return null;
@@ -160,23 +174,31 @@ const DashboardScreen = ({ navigation }: any) => {
                 >
                     <View style={styles.headerTop}>
                         <View style={styles.logoRow}>
-                            <LinearGradient 
-                                colors={['#ff4103', '#0c4651']}
-                                style={styles.miniLogo}
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 1, y: 1 }}
-                            >
-                                <Shield size={20} color="#FFFFFF" />
-                            </LinearGradient>
-                            <Text style={styles.logoText}>TrustPass</Text>
+                            <Image 
+                                source={require('../../assets/icon.png')} 
+                                style={[styles.miniLogo, { backgroundColor: 'transparent' }]} 
+                                resizeMode="contain"
+                            />
+                            <Text style={styles.logoText}>BizBlock</Text>
                         </View>
-                        <TouchableOpacity onPress={logout} style={styles.logoutBtn}>
+                        <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
                             <LogOut size={16} color="#F87171" />
                             <Text style={styles.logoutText}>Logout</Text>
                         </TouchableOpacity>
                     </View>
                     <Text style={styles.greeting}>Welcome back,</Text>
                     <Text style={styles.emailText}>{user?.email}</Text>
+                    
+                    {user?.walletAddress && (
+                        <TouchableOpacity style={{ marginBottom: 14 }} onPress={async () => {
+                            await Clipboard.setStringAsync(user.walletAddress);
+                            Alert.alert('Copied', 'Wallet address copied to clipboard!');
+                        }}>
+                            <Text style={{ color: '#94A3B8', fontSize: 13, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }}>
+                                {user.walletAddress.substring(0, 10)}...{user.walletAddress.substring(38)}
+                            </Text>
+                        </TouchableOpacity>
+                    )}
                     
                     <View style={styles.roleBadge}>
                         <LinearGradient 
