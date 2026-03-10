@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Alert, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import QRCode from 'react-native-qrcode-svg';
 import { fetchLicenseSmart } from '../services/offline';
 import { zkApi } from '../services/api';
 import { ShieldCheck, ShieldAlert, KeyRound, Building, Hash, Calendar, FileText, ChevronLeft, Link as LinkIcon, Fingerprint } from 'lucide-react-native';
+import { AuthContext } from '../context/AuthContext';
 
 const LicenseDetailScreen = ({ route, navigation }: any) => {
+    const { user } = useContext(AuthContext);
     const { licenseId, licenseData } = route.params || {};
     const [license, setLicense] = useState<any>(licenseData || null);
     const [loading, setLoading] = useState(!licenseData);
@@ -74,6 +76,16 @@ const LicenseDetailScreen = ({ route, navigation }: any) => {
     const isSuspended = license.status === 1;
     const StatusIcon = isActive ? ShieldCheck : ShieldAlert;
     const statusGradient: [string, string] = isActive ? ['#cc3200', '#ff4103'] : (isSuspended ? ['#cc3200', '#ff4103'] : ['#DC2626', '#EF4444']);
+    
+    // Check if current user is the license owner (business)
+    const isLicenseOwner = user?.role === 'business' && user?.walletAddress?.toLowerCase() === license.holderAddress?.toLowerCase();
+    const showZKButton = isLicenseOwner;
+    
+    console.log('User role:', user?.role);
+    console.log('User wallet:', user?.walletAddress);
+    console.log('License holder:', license.holderAddress);
+    console.log('Is license owner:', isLicenseOwner);
+    console.log('Show ZK button:', showZKButton);
 
     return (
         <View style={{ flex: 1 }}>
@@ -119,26 +131,28 @@ const LicenseDetailScreen = ({ route, navigation }: any) => {
                         </LinearGradient>
                     </View>
 
-                    {/* ZK Privacy Proof */}
-                    <TouchableOpacity onPress={generateZKProof} disabled={zkLoading}>
-                        <LinearGradient 
-                            colors={['#cc3200', '#0c4651']}
-                            style={styles.zkButton}
-                            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                        >
-                            {zkLoading ? (
-                                <ActivityIndicator color="#FFFFFF" />
-                            ) : (
-                                <>
-                                    <Fingerprint size={20} color="#FFFFFF" />
-                                    <Text style={styles.zkButtonText}>Generate Privacy Proof (ZKP)</Text>
-                                </>
-                            )}
-                        </LinearGradient>
-                    </TouchableOpacity>
+                    {/* ZK Privacy Proof - Only show for license owner (business) */}
+                    {showZKButton && (
+                        <TouchableOpacity onPress={generateZKProof} disabled={zkLoading}>
+                            <LinearGradient 
+                                colors={['#cc3200', '#0c4651']}
+                                style={styles.zkButton}
+                                start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                            >
+                                {zkLoading ? (
+                                    <ActivityIndicator color="#FFFFFF" />
+                                ) : (
+                                    <>
+                                        <Fingerprint size={20} color="#FFFFFF" />
+                                        <Text style={styles.zkButtonText}>Generate Privacy Proof (ZKP)</Text>
+                                    </>
+                                )}
+                            </LinearGradient>
+                        </TouchableOpacity>
+                    )}
 
-                    {/* ZK Proof QR */}
-                    {zkProof && (
+                    {/* ZK Proof QR - Only show for license owner (business) */}
+                    {showZKButton && zkProof && (
                         <View style={styles.zkQrCard}>
                             <LinearGradient colors={['rgba(12,70,81,0.12)', 'rgba(255,65,3,0.05)']} style={styles.zkQrGradient}>
                                 <Text style={styles.zkQrLabel}>🔐 ZERO-KNOWLEDGE PROOF QR</Text>

@@ -28,6 +28,8 @@ import LicenseDetailScreen from './src/screens/LicenseDetailScreen';
 import SearchLicenseScreen from './src/screens/SearchLicenseScreen';
 import ZKVerifyScreen from './src/screens/ZKVerifyScreen';
 import ZKResultScreen from './src/screens/ZKResultScreen';
+import RequestLicenseScreen from './src/screens/RequestLicenseScreen';
+import PendingApprovalsScreen from './src/screens/PendingApprovalsScreen';
 
 import { ActivityIndicator, View } from 'react-native';
 
@@ -52,8 +54,10 @@ const AppNavigator = () => {
                 ) : (
                     <>
                         <Stack.Screen name="Dashboard" component={DashboardScreen} />
-                        <Stack.Screen name="MyLicenses" component={MyLicensesScreen} options={{ headerShown: true, title: 'My Licenses' }} />
-                        <Stack.Screen name="RegisterLicense" component={RegisterLicenseScreen} options={{ headerShown: true, title: 'Register License' }} />
+                        <Stack.Screen name="MyLicenses" component={MyLicensesScreen} options={{ headerShown: false, title: 'My Licenses' }} />
+                        <Stack.Screen name="RegisterLicense" component={RegisterLicenseScreen} options={{ headerShown: false, title: 'Issue License' }} />
+                        <Stack.Screen name="RequestLicense" component={RequestLicenseScreen} options={{ headerShown: false }} />
+                        <Stack.Screen name="PendingApprovals" component={PendingApprovalsScreen} options={{ headerShown: false }} />
                         <Stack.Screen name="Scan" component={ScanScreen} />
                         <Stack.Screen name="SearchLicense" component={SearchLicenseScreen} />
                         <Stack.Screen name="LicenseDetail" component={LicenseDetailScreen} />

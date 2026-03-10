@@ -61,99 +61,117 @@ const DashboardScreen = ({ navigation }: any) => {
 
         if (user.role === 'regulator') {
             commonCards.push(
-                <DashboardCard 
+                <DashboardCard
                     key="register"
-                    title="Register License" 
+                    title="Register License"
                     subtitle="Mint on-chain"
-                    icon={<PlusCircle color="#FFFFFF" size={28} />} 
-                    onPress={() => navigation.navigate('RegisterLicense')} 
+                    icon={<PlusCircle color="#FFFFFF" size={28} />}
+                    onPress={() => navigation.navigate('RegisterLicense')}
                     colors={['#cc3200', '#ff4103']}
                     delay={100}
                 />,
-                <DashboardCard 
+                <DashboardCard
                     key="search"
-                    title="Search Licenses" 
+                    title="Search Licenses"
                     subtitle="Lookup by ID"
-                    icon={<FileSearch color="#FFFFFF" size={28} />} 
-                    onPress={() => navigation.navigate('SearchLicense')} 
+                    icon={<FileSearch color="#FFFFFF" size={28} />}
+                    onPress={() => navigation.navigate('SearchLicense')}
                     colors={['#cc3200', '#ff4103']}
                     delay={200}
                 />,
-                <DashboardCard 
+                <DashboardCard
                     key="scan"
-                    title="Scan QR" 
+                    title="Scan QR"
                     subtitle="Camera verify"
-                    icon={<Scan color="#FFFFFF" size={28} />} 
-                    onPress={() => navigation.navigate('Scan')} 
+                    icon={<Scan color="#FFFFFF" size={28} />}
+                    onPress={() => navigation.navigate('Scan')}
                     colors={['#0a3540', '#0c4651']}
                     delay={300}
                 />,
-                <DashboardCard 
+                <DashboardCard
                     key="zk"
-                    title="ZK Verify" 
+                    title="ZK Verify"
                     subtitle="Privacy proof"
-                    icon={<Fingerprint color="#FFFFFF" size={28} />} 
-                    onPress={() => navigation.navigate('ZKVerify')} 
+                    icon={<Fingerprint color="#FFFFFF" size={28} />}
+                    onPress={() => navigation.navigate('ZKVerify')}
                     colors={['#cc3200', '#ff4103']}
                     delay={400}
+                />,
+                <DashboardCard
+                    key="approvals"
+                    title="Pending Approvals"
+                    subtitle="Review requests"
+                    icon={<LayoutList color="#FFFFFF" size={28} />}
+                    onPress={() => navigation.navigate('PendingApprovals')}
+                    colors={['#0a3540', '#0c4651']}
+                    delay={500}
                 />,
             );
         } else if (user.role === 'business') {
             commonCards.push(
-                <DashboardCard 
+                <DashboardCard
                     key="licenses"
-                    title="My Licenses" 
+                    title="My Licenses"
                     subtitle="View all"
-                    icon={<LayoutList color="#FFFFFF" size={28} />} 
-                    onPress={() => navigation.navigate('MyLicenses')} 
+                    icon={<LayoutList color="#FFFFFF" size={28} />}
+                    onPress={() => navigation.navigate('MyLicenses')}
                     colors={['#cc3200', '#ff4103']}
                     delay={100}
                 />,
-                <DashboardCard 
+                <DashboardCard
                     key="share"
-                    title="Share QR" 
+                    title="Share QR"
                     subtitle="Quick share"
-                    icon={<Scan color="#FFFFFF" size={28} />} 
-                    onPress={() => navigation.navigate('MyLicenses')} 
+                    icon={<Scan color="#FFFFFF" size={28} />}
+                    onPress={() => navigation.navigate('MyLicenses')}
                     colors={['#cc3200', '#ff4103']}
                     delay={200}
                 />,
-                <DashboardCard 
+                <DashboardCard
                     key="zk"
-                    title="ZK Verify" 
+                    title="ZK Verify"
                     subtitle="Privacy proof"
-                    icon={<Fingerprint color="#FFFFFF" size={28} />} 
-                    onPress={() => navigation.navigate('ZKVerify')} 
+                    icon={<Fingerprint color="#FFFFFF" size={28} />}
+                    onPress={() => navigation.navigate('ZKVerify')}
                     colors={['#cc3200', '#ff4103']}
                     delay={300}
+                />,
+                <DashboardCard
+                    key="request"
+                    title="Request License"
+                    subtitle="New application"
+                    icon={<PlusCircle color="#FFFFFF" size={28} />}
+                    onPress={() => navigation.navigate('RequestLicense')}
+                    colors={['#0a3540', '#0c4651']}
+                    delay={400}
                 />,
             );
         } else if (user.role === 'verifier') {
             commonCards.push(
-                <DashboardCard 
+                <DashboardCard
                     key="scan"
-                    title="Scan QR" 
+                    title="Scan QR"
                     subtitle="Camera verify"
-                    icon={<Scan color="#FFFFFF" size={28} />} 
-                    onPress={() => navigation.navigate('Scan')} 
+                    icon={<Scan color="#FFFFFF" size={28} />}
+                    onPress={() => navigation.navigate('Scan')}
                     colors={['#0a3540', '#0c4651']}
                     delay={100}
                 />,
-                <DashboardCard 
+                <DashboardCard
                     key="search"
-                    title="Search by ID" 
+                    title="Search by ID"
                     subtitle="Manual lookup"
-                    icon={<FileSearch color="#FFFFFF" size={28} />} 
-                    onPress={() => navigation.navigate('SearchLicense')} 
+                    icon={<FileSearch color="#FFFFFF" size={28} />}
+                    onPress={() => navigation.navigate('SearchLicense')}
                     colors={['#cc3200', '#ff4103']}
                     delay={200}
                 />,
-                <DashboardCard 
+                <DashboardCard
                     key="zk"
-                    title="ZK Verify" 
+                    title="ZK Verify"
                     subtitle="Privacy proof"
-                    icon={<Fingerprint color="#FFFFFF" size={28} />} 
-                    onPress={() => navigation.navigate('ZKVerify')} 
+                    icon={<Fingerprint color="#FFFFFF" size={28} />}
+                    onPress={() => navigation.navigate('ZKVerify')}
                     colors={['#cc3200', '#ff4103']}
                     delay={300}
                 />,
@@ -168,15 +186,15 @@ const DashboardScreen = ({ navigation }: any) => {
             <LinearGradient colors={['#001621', '#011e2d']} style={StyleSheet.absoluteFill} />
             <ScrollView style={{ flex: 1 }}>
                 {/* Header */}
-                <LinearGradient 
+                <LinearGradient
                     colors={['#011e2d', '#001621']}
                     style={styles.headerArea}
                 >
                     <View style={styles.headerTop}>
                         <View style={styles.logoRow}>
-                            <Image 
-                                source={require('../../assets/icon.png')} 
-                                style={[styles.miniLogo, { backgroundColor: 'transparent' }]} 
+                            <Image
+                                source={require('../../assets/icon.png')}
+                                style={[styles.miniLogo, { backgroundColor: 'transparent' }]}
                                 resizeMode="contain"
                             />
                             <Text style={styles.logoText}>BizBlock</Text>
@@ -188,7 +206,7 @@ const DashboardScreen = ({ navigation }: any) => {
                     </View>
                     <Text style={styles.greeting}>Welcome back,</Text>
                     <Text style={styles.emailText}>{user?.email}</Text>
-                    
+
                     {user?.walletAddress && (
                         <TouchableOpacity style={{ marginBottom: 14 }} onPress={async () => {
                             await Clipboard.setStringAsync(user.walletAddress);
@@ -199,9 +217,9 @@ const DashboardScreen = ({ navigation }: any) => {
                             </Text>
                         </TouchableOpacity>
                     )}
-                    
+
                     <View style={styles.roleBadge}>
-                        <LinearGradient 
+                        <LinearGradient
                             colors={['#ff4103', '#0c4651']}
                             style={styles.roleBadgeGradient}
                             start={{ x: 0, y: 0 }}

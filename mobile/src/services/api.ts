@@ -3,7 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
 const getBaseUrl = () => {
-  return 'http://10.10.9.226:3001/api';
+    // Use localhost for local development, change to your actual IP for device testing
+    return 'http://10.10.9.226:3001/api';
 };
 
 const API_URL = getBaseUrl();
@@ -42,6 +43,14 @@ export const licenseApi = {
 export const zkApi = {
     createProof: (licenseId: string) => api.post('/licenses/zk/create-proof', { licenseId }),
     verifyProof: (proofHash: string) => api.get(`/licenses/zk/verify/${proofHash}`),
+};
+
+export const requestApi = {
+    create: (data: any) => api.post('/requests', data),
+    getMyRequests: () => api.get('/requests/my-requests'),
+    getPending: () => api.get('/requests/pending'),
+    approve: (requestId: string, data: any) => api.post(`/requests/${requestId}/approve`, data),
+    reject: (requestId: string) => api.post(`/requests/${requestId}/reject`),
 };
 
 export default api;
