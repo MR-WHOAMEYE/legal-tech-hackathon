@@ -61,7 +61,7 @@ const MyLicensesScreen = ({ navigation }: any) => {
     if (loading) {
         return (
             <View style={styles.center}>
-                <ActivityIndicator size="large" color="#2563EB" />
+                <ActivityIndicator size="large" color="#001621" />
             </View>
         );
     }
