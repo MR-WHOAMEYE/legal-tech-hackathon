@@ -53,7 +53,7 @@ const DashboardScreen = ({ navigation }: any) => {
                     subtitle="Mint on-chain"
                     icon={<PlusCircle color="#FFFFFF" size={28} />} 
                     onPress={() => navigation.navigate('RegisterLicense')} 
-                    colors={['#059669', '#10B981']}
+                    colors={['#cc3200', '#ff4103']}
                     delay={100}
                 />,
                 <DashboardCard 
@@ -62,7 +62,7 @@ const DashboardScreen = ({ navigation }: any) => {
                     subtitle="Lookup by ID"
                     icon={<FileSearch color="#FFFFFF" size={28} />} 
                     onPress={() => navigation.navigate('SearchLicense')} 
-                    colors={['#2563EB', '#3B82F6']}
+                    colors={['#cc3200', '#ff4103']}
                     delay={200}
                 />,
                 <DashboardCard 
@@ -71,7 +71,7 @@ const DashboardScreen = ({ navigation }: any) => {
                     subtitle="Camera verify"
                     icon={<Scan color="#FFFFFF" size={28} />} 
                     onPress={() => navigation.navigate('Scan')} 
-                    colors={['#7C3AED', '#8B5CF6']}
+                    colors={['#0a3540', '#0c4651']}
                     delay={300}
                 />,
                 <DashboardCard 
@@ -80,7 +80,7 @@ const DashboardScreen = ({ navigation }: any) => {
                     subtitle="Privacy proof"
                     icon={<Fingerprint color="#FFFFFF" size={28} />} 
                     onPress={() => navigation.navigate('ZKVerify')} 
-                    colors={['#0891B2', '#06B6D4']}
+                    colors={['#cc3200', '#ff4103']}
                     delay={400}
                 />,
             );
@@ -92,7 +92,7 @@ const DashboardScreen = ({ navigation }: any) => {
                     subtitle="View all"
                     icon={<LayoutList color="#FFFFFF" size={28} />} 
                     onPress={() => navigation.navigate('MyLicenses')} 
-                    colors={['#D97706', '#F59E0B']}
+                    colors={['#cc3200', '#ff4103']}
                     delay={100}
                 />,
                 <DashboardCard 
@@ -101,7 +101,7 @@ const DashboardScreen = ({ navigation }: any) => {
                     subtitle="Quick share"
                     icon={<Scan color="#FFFFFF" size={28} />} 
                     onPress={() => navigation.navigate('MyLicenses')} 
-                    colors={['#2563EB', '#3B82F6']}
+                    colors={['#cc3200', '#ff4103']}
                     delay={200}
                 />,
                 <DashboardCard 
@@ -110,7 +110,7 @@ const DashboardScreen = ({ navigation }: any) => {
                     subtitle="Privacy proof"
                     icon={<Fingerprint color="#FFFFFF" size={28} />} 
                     onPress={() => navigation.navigate('ZKVerify')} 
-                    colors={['#0891B2', '#06B6D4']}
+                    colors={['#cc3200', '#ff4103']}
                     delay={300}
                 />,
             );
@@ -122,7 +122,7 @@ const DashboardScreen = ({ navigation }: any) => {
                     subtitle="Camera verify"
                     icon={<Scan color="#FFFFFF" size={28} />} 
                     onPress={() => navigation.navigate('Scan')} 
-                    colors={['#7C3AED', '#8B5CF6']}
+                    colors={['#0a3540', '#0c4651']}
                     delay={100}
                 />,
                 <DashboardCard 
@@ -131,7 +131,7 @@ const DashboardScreen = ({ navigation }: any) => {
                     subtitle="Manual lookup"
                     icon={<FileSearch color="#FFFFFF" size={28} />} 
                     onPress={() => navigation.navigate('SearchLicense')} 
-                    colors={['#2563EB', '#3B82F6']}
+                    colors={['#cc3200', '#ff4103']}
                     delay={200}
                 />,
                 <DashboardCard 
@@ -140,7 +140,7 @@ const DashboardScreen = ({ navigation }: any) => {
                     subtitle="Privacy proof"
                     icon={<Fingerprint color="#FFFFFF" size={28} />} 
                     onPress={() => navigation.navigate('ZKVerify')} 
-                    colors={['#0891B2', '#06B6D4']}
+                    colors={['#cc3200', '#ff4103']}
                     delay={300}
                 />,
             );
@@ -151,17 +151,17 @@ const DashboardScreen = ({ navigation }: any) => {
 
     return (
         <View style={styles.container}>
-            <LinearGradient colors={['#0F172A', '#1E293B']} style={StyleSheet.absoluteFill} />
+            <LinearGradient colors={['#001621', '#011e2d']} style={StyleSheet.absoluteFill} />
             <ScrollView style={{ flex: 1 }}>
                 {/* Header */}
                 <LinearGradient 
-                    colors={['#1E293B', '#0F172A']}
+                    colors={['#011e2d', '#001621']}
                     style={styles.headerArea}
                 >
                     <View style={styles.headerTop}>
                         <View style={styles.logoRow}>
                             <LinearGradient 
-                                colors={['#06B6D4', '#8B5CF6']}
+                                colors={['#ff4103', '#0c4651']}
                                 style={styles.miniLogo}
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1, y: 1 }}
@@ -180,7 +180,7 @@ const DashboardScreen = ({ navigation }: any) => {
                     
                     <View style={styles.roleBadge}>
                         <LinearGradient 
-                            colors={['#06B6D4', '#8B5CF6']}
+                            colors={['#ff4103', '#0c4651']}
                             style={styles.roleBadgeGradient}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 0 }}

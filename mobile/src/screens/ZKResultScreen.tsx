@@ -41,7 +41,7 @@ const ZKResultScreen = ({ route, navigation }: any) => {
 
     return (
         <View style={styles.container}>
-            <LinearGradient colors={['#0F172A', '#1E293B', '#0F172A']} style={StyleSheet.absoluteFill} />
+            <LinearGradient colors={['#001621', '#011e2d', '#001621']} style={StyleSheet.absoluteFill} />
 
             <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
                 <ChevronLeft size={24} color="#94A3B8" />
@@ -51,7 +51,7 @@ const ZKResultScreen = ({ route, navigation }: any) => {
                 {/* Status Badge */}
                 <Animated.View style={[styles.iconContainer, { transform: [{ scale: pulseAnim }] }]}>
                     <LinearGradient
-                        colors={isValid ? ['#059669', '#10B981'] : ['#DC2626', '#EF4444']}
+                        colors={isValid ? ['#cc3200', '#ff4103'] : ['#DC2626', '#EF4444']}
                         style={styles.iconGradient}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
@@ -61,7 +61,7 @@ const ZKResultScreen = ({ route, navigation }: any) => {
                 </Animated.View>
 
                 {/* Status Text */}
-                <Text style={[styles.statusTitle, { color: isValid ? '#10B981' : '#EF4444' }]}>
+                <Text style={[styles.statusTitle, { color: isValid ? '#ff4103' : '#EF4444' }]}>
                     {isValid ? 'VERIFIED' : 'NOT VERIFIED'}
                 </Text>
                 <Text style={styles.statusSubtitle}>
@@ -70,7 +70,7 @@ const ZKResultScreen = ({ route, navigation }: any) => {
 
                 {/* Privacy Shield */}
                 <View style={styles.privacyBadge}>
-                    <Lock size={14} color="#8B5CF6" />
+                    <Lock size={14} color="#0c4651" />
                     <Text style={styles.privacyText}>Zero-Knowledge Proof — No data was revealed</Text>
                 </View>
 
@@ -90,11 +90,11 @@ const ZKResultScreen = ({ route, navigation }: any) => {
                 {/* What was NOT revealed */}
                 <View style={styles.hiddenCard}>
                     <LinearGradient
-                        colors={['rgba(139,92,246,0.1)', 'rgba(139,92,246,0.03)']}
+                        colors={['rgba(12,70,81,0.1)', 'rgba(12,70,81,0.03)']}
                         style={styles.hiddenGradient}
                     >
                         <View style={styles.hiddenHeader}>
-                            <EyeOff size={16} color="#8B5CF6" />
+                            <EyeOff size={16} color="#0c4651" />
                             <Text style={styles.hiddenTitle}>Data Protected by ZKP</Text>
                         </View>
                         <View style={styles.hiddenList}>
@@ -117,7 +117,7 @@ const ZKResultScreen = ({ route, navigation }: any) => {
 
                 <TouchableOpacity onPress={() => navigation.navigate('Dashboard')}>
                     <LinearGradient
-                        colors={isValid ? ['#059669', '#10B981'] : ['#4B5563', '#6B7280']}
+                        colors={isValid ? ['#cc3200', '#ff4103'] : ['#4B5563', '#6B7280']}
                         style={styles.doneButton}
                         start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
                     >
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
         width: 120, height: 120, borderRadius: 60,
         justifyContent: 'center', alignItems: 'center',
         marginBottom: 24,
-        shadowColor: '#10B981', shadowOffset: { width: 0, height: 8 },
+        shadowColor: '#ff4103', shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.4, shadowRadius: 20,
     },
     iconGradient: {
@@ -161,26 +161,26 @@ const styles = StyleSheet.create({
     },
     privacyBadge: {
         flexDirection: 'row', alignItems: 'center',
-        backgroundColor: 'rgba(139,92,246,0.1)',
+        backgroundColor: 'rgba(12,70,81,0.1)',
         paddingHorizontal: 14, paddingVertical: 8,
         borderRadius: 20, marginBottom: 24,
-        borderWidth: 1, borderColor: 'rgba(139,92,246,0.2)',
+        borderWidth: 1, borderColor: 'rgba(12,70,81,0.2)',
     },
-    privacyText: { color: '#A78BFA', fontSize: 12, fontWeight: '600', marginLeft: 6 },
+    privacyText: { color: '#ff7744', fontSize: 12, fontWeight: '600', marginLeft: 6 },
     infoCard: {
         width: '100%', borderRadius: 16, overflow: 'hidden',
         marginBottom: 16, borderWidth: 1, borderColor: 'rgba(16,185,129,0.15)',
     },
     infoGradient: { padding: 20, alignItems: 'center' },
     infoLabel: { fontSize: 11, color: '#6B7280', fontWeight: '700', letterSpacing: 1.5, marginBottom: 6 },
-    infoValue: { fontSize: 22, color: '#10B981', fontWeight: '800', letterSpacing: 1 },
+    infoValue: { fontSize: 22, color: '#ff4103', fontWeight: '800', letterSpacing: 1 },
     hiddenCard: {
         width: '100%', borderRadius: 16, overflow: 'hidden',
-        marginBottom: 16, borderWidth: 1, borderColor: 'rgba(139,92,246,0.15)',
+        marginBottom: 16, borderWidth: 1, borderColor: 'rgba(12,70,81,0.15)',
     },
     hiddenGradient: { padding: 20 },
     hiddenHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 14 },
-    hiddenTitle: { fontSize: 14, color: '#C4B5FD', fontWeight: '700', marginLeft: 8 },
+    hiddenTitle: { fontSize: 14, color: '#ffaa88', fontWeight: '700', marginLeft: 8 },
     hiddenList: {},
     hiddenItem: {
         flexDirection: 'row', alignItems: 'center',
@@ -188,12 +188,12 @@ const styles = StyleSheet.create({
     },
     redactedDot: {
         width: 6, height: 6, borderRadius: 3,
-        backgroundColor: '#4C1D95', marginRight: 10,
+        backgroundColor: '#0a3540', marginRight: 10,
     },
     hiddenItemText: { flex: 1, fontSize: 13, color: '#64748B' },
     redactedTag: {
-        fontSize: 10, color: '#7C3AED', fontWeight: '800',
-        backgroundColor: 'rgba(124,58,237,0.1)',
+        fontSize: 10, color: '#0c4651', fontWeight: '800',
+        backgroundColor: 'rgba(12,70,81,0.1)',
         paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4,
         letterSpacing: 1,
     },

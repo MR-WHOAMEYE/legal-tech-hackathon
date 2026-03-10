@@ -52,7 +52,7 @@ const ScanScreen = ({ navigation }: any) => {
     if (hasPermission === null) {
         return (
             <View style={styles.container}>
-                <LinearGradient colors={['#0F172A', '#1E293B']} style={StyleSheet.absoluteFill} />
+                <LinearGradient colors={['#001621', '#011e2d']} style={StyleSheet.absoluteFill} />
                 <Text style={styles.permissionText}>Requesting camera permission...</Text>
             </View>
         );
@@ -60,7 +60,7 @@ const ScanScreen = ({ navigation }: any) => {
     if (hasPermission === false) {
         return (
             <View style={styles.container}>
-                <LinearGradient colors={['#0F172A', '#1E293B']} style={StyleSheet.absoluteFill} />
+                <LinearGradient colors={['#001621', '#011e2d']} style={StyleSheet.absoluteFill} />
                 <Text style={styles.permissionText}>No access to camera. Please enable in settings.</Text>
             </View>
         );
@@ -78,7 +78,7 @@ const ScanScreen = ({ navigation }: any) => {
                 <View style={styles.overlayTop}>
                     <View style={styles.topBar}>
                         <View style={styles.brandRow}>
-                            <ShieldCheck size={20} color="#06B6D4" />
+                            <ShieldCheck size={20} color="#ff4103" />
                             <Text style={styles.brandText}>TrustPass Scanner</Text>
                         </View>
                         <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
@@ -105,7 +105,7 @@ const ScanScreen = ({ navigation }: any) => {
                     {scanned ? (
                         <TouchableOpacity onPress={() => setScanned(false)}>
                             <LinearGradient 
-                                colors={['#06B6D4', '#8B5CF6']}
+                                colors={['#ff4103', '#0c4651']}
                                 style={styles.rescanButton}
                                 start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
                             >
@@ -156,22 +156,22 @@ const styles = StyleSheet.create({
     topLeft: {
         top: 0, left: 0,
         borderTopWidth: 3, borderLeftWidth: 3,
-        borderColor: '#06B6D4', borderTopLeftRadius: 8,
+        borderColor: '#ff4103', borderTopLeftRadius: 8,
     },
     topRight: {
         top: 0, right: 0,
         borderTopWidth: 3, borderRightWidth: 3,
-        borderColor: '#06B6D4', borderTopRightRadius: 8,
+        borderColor: '#ff4103', borderTopRightRadius: 8,
     },
     bottomLeft: {
         bottom: 0, left: 0,
         borderBottomWidth: 3, borderLeftWidth: 3,
-        borderColor: '#8B5CF6', borderBottomLeftRadius: 8,
+        borderColor: '#0c4651', borderBottomLeftRadius: 8,
     },
     bottomRight: {
         bottom: 0, right: 0,
         borderBottomWidth: 3, borderRightWidth: 3,
-        borderColor: '#8B5CF6', borderBottomRightRadius: 8,
+        borderColor: '#0c4651', borderBottomRightRadius: 8,
     },
     overlayBottom: {
         flex: 1.5, width: '100%',

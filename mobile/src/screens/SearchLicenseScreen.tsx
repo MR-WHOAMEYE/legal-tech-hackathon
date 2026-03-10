@@ -21,7 +21,7 @@ const SearchLicenseScreen = ({ navigation }: any) => {
 
     return (
         <View style={styles.container}>
-            <LinearGradient colors={['#0F172A', '#1E293B', '#0F172A']} style={StyleSheet.absoluteFill} />
+            <LinearGradient colors={['#001621', '#011e2d', '#001621']} style={StyleSheet.absoluteFill} />
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
                 <ScrollView contentContainerStyle={styles.scrollContent}>
                     <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
@@ -29,7 +29,7 @@ const SearchLicenseScreen = ({ navigation }: any) => {
                     </TouchableOpacity>
 
                     <View style={styles.header}>
-                        <LinearGradient colors={['#2563EB', '#3B82F6']} style={styles.iconCircle} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                        <LinearGradient colors={['#cc3200', '#ff4103']} style={styles.iconCircle} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
                             <Search size={36} color="#FFFFFF" />
                         </LinearGradient>
                         <Text style={styles.title}>Search License</Text>
@@ -40,7 +40,7 @@ const SearchLicenseScreen = ({ navigation }: any) => {
                         <LinearGradient colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.02)']} style={styles.formGradient}>
                             <Text style={styles.label}>LICENSE ID</Text>
                             <View style={styles.inputGroup}>
-                                <Hash color="#3B82F6" size={20} style={styles.inputIcon} />
+                                <Hash color="#ff4103" size={20} style={styles.inputIcon} />
                                 <TextInput
                                     style={styles.input}
                                     placeholder="e.g. GST-12345"
@@ -54,7 +54,7 @@ const SearchLicenseScreen = ({ navigation }: any) => {
                             </View>
 
                             <TouchableOpacity onPress={handleSearch} disabled={isLoading} activeOpacity={0.8}>
-                                <LinearGradient colors={['#2563EB', '#3B82F6']} style={styles.submitButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                                <LinearGradient colors={['#cc3200', '#ff4103']} style={styles.submitButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
                                     {isLoading ? (
                                         <ActivityIndicator color="#FFFFFF" />
                                     ) : (
@@ -66,7 +66,7 @@ const SearchLicenseScreen = ({ navigation }: any) => {
                     </View>
 
                     <View style={styles.helpCard}>
-                        <LinearGradient colors={['rgba(37,99,235,0.1)', 'rgba(37,99,235,0.03)']} style={styles.helpGradient}>
+                        <LinearGradient colors={['rgba(204,50,0,0.1)', 'rgba(204,50,0,0.03)']} style={styles.helpGradient}>
                             <Text style={styles.helpTitle}>🔗 How it works</Text>
                             <Text style={styles.helpText}>
                                 This search queries the blockchain securely to verify that the license exists, is authentic, and has not been revoked or suspended. Results are fetched directly from the smart contract.
@@ -120,10 +120,10 @@ const styles = StyleSheet.create({
     submitText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
     helpCard: {
         borderRadius: 16, overflow: 'hidden',
-        borderWidth: 1, borderColor: 'rgba(37,99,235,0.15)',
+        borderWidth: 1, borderColor: 'rgba(204,50,0,0.15)',
     },
     helpGradient: { padding: 20 },
-    helpTitle: { fontSize: 15, fontWeight: '700', color: '#93C5FD', marginBottom: 8 },
+    helpTitle: { fontSize: 15, fontWeight: '700', color: '#ffbb99', marginBottom: 8 },
     helpText: { fontSize: 13, color: '#64748B', lineHeight: 20 },
 });
 

@@ -40,17 +40,17 @@ const RegisterLicenseScreen = ({ navigation }: any) => {
     };
 
     const fields = [
-        { icon: <Hash color="#8B5CF6" size={18} />, placeholder: 'License ID (e.g. GST-12345)', value: licenseId, setter: setLicenseId },
-        { icon: <FileSignature color="#8B5CF6" size={18} />, placeholder: 'License Type (GST, Trade, FSSAI)', value: licenseType, setter: setLicenseType },
-        { icon: <Building2 color="#8B5CF6" size={18} />, placeholder: 'Business Name', value: businessName, setter: setBusinessName },
-        { icon: <UserCircle color="#8B5CF6" size={18} />, placeholder: 'Holder Wallet Address (0x...)', value: holderAddress, setter: setHolderAddress },
-        { icon: <Calendar color="#8B5CF6" size={18} />, placeholder: 'Expiry Date (YYYY-MM-DD)', value: expiryDate, setter: setExpiryDate },
-        { icon: <HashIcon color="#8B5CF6" size={18} />, placeholder: 'Document Hash (IPFS CID / SHA256)', value: documentHash, setter: setDocumentHash },
+        { icon: <Hash color="#0c4651" size={18} />, placeholder: 'License ID (e.g. GST-12345)', value: licenseId, setter: setLicenseId },
+        { icon: <FileSignature color="#0c4651" size={18} />, placeholder: 'License Type (GST, Trade, FSSAI)', value: licenseType, setter: setLicenseType },
+        { icon: <Building2 color="#0c4651" size={18} />, placeholder: 'Business Name', value: businessName, setter: setBusinessName },
+        { icon: <UserCircle color="#0c4651" size={18} />, placeholder: 'Holder Wallet Address (0x...)', value: holderAddress, setter: setHolderAddress },
+        { icon: <Calendar color="#0c4651" size={18} />, placeholder: 'Expiry Date (YYYY-MM-DD)', value: expiryDate, setter: setExpiryDate },
+        { icon: <HashIcon color="#0c4651" size={18} />, placeholder: 'Document Hash (IPFS CID / SHA256)', value: documentHash, setter: setDocumentHash },
     ];
 
     return (
         <View style={styles.container}>
-            <LinearGradient colors={['#0F172A', '#1E293B', '#0F172A']} style={StyleSheet.absoluteFill} />
+            <LinearGradient colors={['#001621', '#011e2d', '#001621']} style={StyleSheet.absoluteFill} />
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
                 <ScrollView contentContainerStyle={styles.scrollContent}>
                     <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
@@ -58,7 +58,7 @@ const RegisterLicenseScreen = ({ navigation }: any) => {
                     </TouchableOpacity>
 
                     <View style={styles.header}>
-                        <LinearGradient colors={['#059669', '#10B981']} style={styles.iconCircle} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                        <LinearGradient colors={['#cc3200', '#ff4103']} style={styles.iconCircle} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
                             <FileSignature size={32} color="#FFFFFF" />
                         </LinearGradient>
                         <Text style={styles.title}>Register License</Text>
@@ -81,7 +81,7 @@ const RegisterLicenseScreen = ({ navigation }: any) => {
                             ))}
 
                             <TouchableOpacity onPress={handleSubmit} disabled={isLoading} activeOpacity={0.8}>
-                                <LinearGradient colors={['#059669', '#10B981']} style={styles.submitButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                                <LinearGradient colors={['#cc3200', '#ff4103']} style={styles.submitButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
                                     {isLoading ? (
                                         <ActivityIndicator color="#FFFFFF" />
                                     ) : (
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     inputGroup: {
         flexDirection: 'row', alignItems: 'center',
         backgroundColor: 'rgba(0,0,0,0.3)',
-        borderWidth: 1, borderColor: 'rgba(139,92,246,0.12)',
+        borderWidth: 1, borderColor: 'rgba(12,70,81,0.12)',
         borderRadius: 12, marginBottom: 12, paddingHorizontal: 12, height: 52,
     },
     inputIconBox: { marginRight: 10 },

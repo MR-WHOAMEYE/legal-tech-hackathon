@@ -50,8 +50,8 @@ const LicenseDetailScreen = ({ route, navigation }: any) => {
     if (loading) {
         return (
             <View style={styles.center}>
-                <LinearGradient colors={['#0F172A', '#1E293B']} style={StyleSheet.absoluteFill} />
-                <ActivityIndicator size="large" color="#06B6D4" />
+                <LinearGradient colors={['#001621', '#011e2d']} style={StyleSheet.absoluteFill} />
+                <ActivityIndicator size="large" color="#ff4103" />
                 <Text style={styles.loadingText}>Verifying Blockchain Record...</Text>
             </View>
         );
@@ -60,7 +60,7 @@ const LicenseDetailScreen = ({ route, navigation }: any) => {
     if (error || !license) {
         return (
             <View style={styles.center}>
-                <LinearGradient colors={['#0F172A', '#1E293B']} style={StyleSheet.absoluteFill} />
+                <LinearGradient colors={['#001621', '#011e2d']} style={StyleSheet.absoluteFill} />
                 <ShieldAlert size={64} color="#EF4444" />
                 <Text style={styles.errorText}>{error || "License not found"}</Text>
                 <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
@@ -73,11 +73,11 @@ const LicenseDetailScreen = ({ route, navigation }: any) => {
     const isActive = license.status === 0;
     const isSuspended = license.status === 1;
     const StatusIcon = isActive ? ShieldCheck : ShieldAlert;
-    const statusGradient: [string, string] = isActive ? ['#059669', '#10B981'] : (isSuspended ? ['#D97706', '#F59E0B'] : ['#DC2626', '#EF4444']);
+    const statusGradient: [string, string] = isActive ? ['#cc3200', '#ff4103'] : (isSuspended ? ['#cc3200', '#ff4103'] : ['#DC2626', '#EF4444']);
 
     return (
         <View style={{ flex: 1 }}>
-            <LinearGradient colors={['#0F172A', '#1E293B', '#0F172A']} style={StyleSheet.absoluteFill} />
+            <LinearGradient colors={['#001621', '#011e2d', '#001621']} style={StyleSheet.absoluteFill} />
             <ScrollView style={styles.container}>
                 {/* Header */}
                 <View style={styles.header}>
@@ -112,7 +112,7 @@ const LicenseDetailScreen = ({ route, navigation }: any) => {
                                 <QRCode
                                     value={JSON.stringify({ licenseId: license.licenseId })}
                                     size={150}
-                                    color="#0F172A"
+                                    color="#001621"
                                     backgroundColor="#FFFFFF"
                                 />
                             </View>
@@ -122,7 +122,7 @@ const LicenseDetailScreen = ({ route, navigation }: any) => {
                     {/* ZK Privacy Proof */}
                     <TouchableOpacity onPress={generateZKProof} disabled={zkLoading}>
                         <LinearGradient 
-                            colors={['#0891B2', '#8B5CF6']}
+                            colors={['#cc3200', '#0c4651']}
                             style={styles.zkButton}
                             start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
                         >
@@ -140,14 +140,14 @@ const LicenseDetailScreen = ({ route, navigation }: any) => {
                     {/* ZK Proof QR */}
                     {zkProof && (
                         <View style={styles.zkQrCard}>
-                            <LinearGradient colors={['rgba(139,92,246,0.12)', 'rgba(6,182,212,0.05)']} style={styles.zkQrGradient}>
+                            <LinearGradient colors={['rgba(12,70,81,0.12)', 'rgba(255,65,3,0.05)']} style={styles.zkQrGradient}>
                                 <Text style={styles.zkQrLabel}>🔐 ZERO-KNOWLEDGE PROOF QR</Text>
                                 <Text style={styles.zkQrDesc}>Share this QR — verifier sees ONLY validity + type</Text>
                                 <View style={styles.qrFrame}>
                                     <QRCode
                                         value={zkProof}
                                         size={150}
-                                        color="#4C1D95"
+                                        color="#0a3540"
                                         backgroundColor="#FFFFFF"
                                     />
                                 </View>
@@ -244,11 +244,11 @@ const styles = StyleSheet.create({
     zkButtonText: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
     zkQrCard: {
         borderRadius: 20, overflow: 'hidden', marginBottom: 16,
-        borderWidth: 1, borderColor: 'rgba(139,92,246,0.2)',
+        borderWidth: 1, borderColor: 'rgba(12,70,81,0.2)',
     },
     zkQrGradient: { padding: 24, alignItems: 'center' },
     zkQrLabel: {
-        fontSize: 12, fontWeight: '800', color: '#C4B5FD',
+        fontSize: 12, fontWeight: '800', color: '#ffaa88',
         letterSpacing: 1, marginBottom: 6,
     },
     zkQrDesc: { fontSize: 12, color: '#64748B', marginBottom: 16, textAlign: 'center' },

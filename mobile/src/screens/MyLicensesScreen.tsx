@@ -30,7 +30,7 @@ const MyLicensesScreen = ({ navigation }: any) => {
 
     const renderItem = ({ item, index }: { item: any, index: number }) => {
         const isActive = item.status === 0;
-        const statusColor = isActive ? '#10B981' : '#EF4444';
+        const statusColor = isActive ? '#ff4103' : '#EF4444';
 
         return (
             <TouchableOpacity 
@@ -62,15 +62,15 @@ const MyLicensesScreen = ({ navigation }: any) => {
     if (loading) {
         return (
             <View style={styles.center}>
-                <LinearGradient colors={['#0F172A', '#1E293B']} style={StyleSheet.absoluteFill} />
-                <ActivityIndicator size="large" color="#06B6D4" />
+                <LinearGradient colors={['#001621', '#011e2d']} style={StyleSheet.absoluteFill} />
+                <ActivityIndicator size="large" color="#ff4103" />
             </View>
         );
     }
 
     return (
         <View style={styles.container}>
-            <LinearGradient colors={['#0F172A', '#1E293B']} style={StyleSheet.absoluteFill} />
+            <LinearGradient colors={['#001621', '#011e2d']} style={StyleSheet.absoluteFill} />
             
             {/* Header */}
             <View style={styles.header}>
@@ -94,7 +94,7 @@ const MyLicensesScreen = ({ navigation }: any) => {
                     renderItem={renderItem}
                     contentContainerStyle={styles.listContainer}
                     refreshControl={
-                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#06B6D4']} tintColor="#06B6D4" />
+                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#ff4103']} tintColor="#ff4103" />
                     }
                 />
             )}

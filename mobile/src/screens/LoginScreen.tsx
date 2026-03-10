@@ -47,7 +47,7 @@ const LoginScreen = ({ navigation }: any) => {
 
     return (
         <View style={styles.container}>
-            <LinearGradient colors={['#0F172A', '#1E293B', '#0F172A']} style={StyleSheet.absoluteFill} />
+            <LinearGradient colors={['#001621', '#011e2d', '#001621']} style={StyleSheet.absoluteFill} />
             
             <KeyboardAvoidingView 
                 style={{ flex: 1 }}
@@ -58,7 +58,7 @@ const LoginScreen = ({ navigation }: any) => {
                     <View style={styles.header}>
                         <View style={styles.logoContainer}>
                             <LinearGradient 
-                                colors={['#06B6D4', '#8B5CF6']}
+                                colors={['#ff4103', '#0c4651']}
                                 style={styles.logoGradient}
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1, y: 1 }}
@@ -95,7 +95,7 @@ const LoginScreen = ({ navigation }: any) => {
 
                             {/* Email */}
                             <View style={styles.inputGroup}>
-                                <Mail color="#8B5CF6" size={20} style={styles.inputIcon} />
+                                <Mail color="#0c4651" size={20} style={styles.inputIcon} />
                                 <TextInput
                                     style={styles.input}
                                     placeholder="Email Address"
@@ -109,7 +109,7 @@ const LoginScreen = ({ navigation }: any) => {
 
                             {/* Password */}
                             <View style={styles.inputGroup}>
-                                <Lock color="#8B5CF6" size={20} style={styles.inputIcon} />
+                                <Lock color="#0c4651" size={20} style={styles.inputIcon} />
                                 <TextInput
                                     style={styles.input}
                                     placeholder="Password"
@@ -144,7 +144,7 @@ const LoginScreen = ({ navigation }: any) => {
                             {/* Business Name (register + business role) */}
                             {!isLogin && role === 'business' && (
                                 <View style={styles.inputGroup}>
-                                    <Building color="#8B5CF6" size={20} style={styles.inputIcon} />
+                                    <Building color="#0c4651" size={20} style={styles.inputIcon} />
                                     <TextInput
                                         style={styles.input}
                                         placeholder="Business Name"
@@ -158,7 +158,7 @@ const LoginScreen = ({ navigation }: any) => {
                             {/* Submit */}
                             <TouchableOpacity onPress={handleSubmit} disabled={isLoading} activeOpacity={0.8}>
                                 <LinearGradient 
-                                    colors={['#06B6D4', '#8B5CF6']}
+                                    colors={['#ff4103', '#0c4651']}
                                     style={styles.submitButton}
                                     start={{ x: 0, y: 0 }}
                                     end={{ x: 1, y: 0 }}
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     logoGradient: {
         width: 72, height: 72, borderRadius: 20,
         justifyContent: 'center', alignItems: 'center',
-        shadowColor: '#06B6D4', shadowOffset: { width: 0, height: 8 },
+        shadowColor: '#ff4103', shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.4, shadowRadius: 16,
     },
     brandName: {
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     inputGroup: {
         flexDirection: 'row', alignItems: 'center',
         backgroundColor: 'rgba(0,0,0,0.3)',
-        borderWidth: 1, borderColor: 'rgba(139,92,246,0.15)',
+        borderWidth: 1, borderColor: 'rgba(12,70,81,0.15)',
         borderRadius: 14, marginBottom: 14,
         paddingHorizontal: 14, height: 54,
     },
@@ -253,12 +253,12 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.2)',
     },
     roleButtonActive: {
-        backgroundColor: 'rgba(139,92,246,0.15)',
-        borderColor: '#8B5CF6',
+        backgroundColor: 'rgba(12,70,81,0.15)',
+        borderColor: '#0c4651',
     },
     roleEmoji: { fontSize: 20, marginBottom: 4 },
     roleText: { fontSize: 12, color: '#64748B', fontWeight: '600' },
-    roleTextActive: { color: '#C4B5FD' },
+    roleTextActive: { color: '#ffaa88' },
     submitButton: {
         borderRadius: 14, height: 54,
         justifyContent: 'center', alignItems: 'center',
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     },
     switchButton: { marginTop: 20, alignItems: 'center' },
     switchText: { color: '#64748B', fontSize: 14 },
-    switchHighlight: { color: '#06B6D4', fontWeight: '700' },
+    switchHighlight: { color: '#ff4103', fontWeight: '700' },
 });
 
 export default LoginScreen;
