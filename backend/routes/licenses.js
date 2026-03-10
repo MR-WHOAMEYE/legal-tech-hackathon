@@ -1,34 +1,9 @@
 import express from 'express';
+import { ethers } from 'ethers';
 import { getContract } from '../config/blockchain.js';
-import jwt from 'jsonwebtoken';
+import { auth, requireRole } from '../middleware/auth.js';
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_jwt_key_hackathon_only_123';
-
-// Auth Middleware to protect routes
-const auth = (req, res, next) => {
-    const token = req.header('x-auth-token') || req.header('Authorization')?.replace('Bearer ', '');
-    if (!token) return res.status(401).json({ error: 'No token, authorization denied' });
-
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = decoded;
-        next();
-    } catch (err) {
-        res.status(401).json({ error: 'Token is not valid' });
-    }
-};
-
-// Role middleware
-const requireRole = (role) => {
-    return (req, res, next) => {
-        if (req.user.role !== role) {
-            return res.status(403).json({ error: 'Access denied. Required role: ' + role });
-        }
-        next();
-    }
-};
-
 
 // 1. REGISTER LICENSE (Regulator Only)
 router.post('/register', [auth, requireRole('regulator')], async (req, res) => {
@@ -38,18 +13,16 @@ router.post('/register', [auth, requireRole('regulator')], async (req, res) => {
 
         if (!contract) return res.status(500).json({ error: 'Blockchain contract not initialized' });
 
-        // Call the smart contract
         console.log(`Registering license ${licenseId} on-chain...`);
         const tx = await contract.registerLicense(
             licenseId,
             licenseType,
             businessName,
             holderAddress,
-            Math.floor(new Date(expiryDate).getTime() / 1000), // convert to unix timestamp sec
+            Math.floor(new Date(expiryDate).getTime() / 1000),
             documentHash
         );
 
-        // Wait for it to be mined
         const receipt = await tx.wait();
 
         res.status(201).json({
@@ -74,17 +47,15 @@ router.get('/verify/:licenseId', async (req, res) => {
 
         const data = await contract.verifyLicense(licenseId);
 
-        // `data` is an array/proxy object from ethers. Format it:
         const license = {
             licenseId: data.licenseId,
             licenseType: data.licenseType,
             businessName: data.businessName,
             holderAddress: data.holderAddress,
             issuerAddress: data.issuerAddress,
-            // ethers v6 returns BigInt for uint256
             issueDate: new Date(Number(data.issueDate) * 1000).toISOString(),
             expiryDate: new Date(Number(data.expiryDate) * 1000).toISOString(),
-            status: Number(data.status), // 0: Active, 1: Suspended, 2: Revoked
+            status: Number(data.status),
             statusString: Number(data.status) === 0 ? 'Active' : (Number(data.status) === 1 ? 'Suspended' : 'Revoked'),
             documentHash: data.documentHash,
             isValid: Number(data.status) === 0 && (Number(data.expiryDate) * 1000) > Date.now()
@@ -94,7 +65,6 @@ router.get('/verify/:licenseId', async (req, res) => {
 
     } catch (err) {
         console.error("License verification error:", err.reason || err.message);
-        // If "License not found" require throws, we return 404
         if (err.message && err.message.includes('License not found')) {
             return res.status(404).json({ error: 'License not found on the blockchain' });
         }
@@ -102,7 +72,49 @@ router.get('/verify/:licenseId', async (req, res) => {
     }
 });
 
-// 3. REVOKE LICENSE (Regulator Only)
+
+// 3. GET LICENSES BY HOLDER ADDRESS (Business)
+router.get('/business/:address', auth, async (req, res) => {
+    try {
+        const { address } = req.params;
+        const contract = getContract();
+
+        if (!contract) return res.status(500).json({ error: 'Blockchain contract not initialized' });
+
+        const licenseIds = await contract.getLicensesByHolder(address);
+
+        const licenses = [];
+        for (const id of licenseIds) {
+            try {
+                const data = await contract.verifyLicense(id);
+                licenses.push({
+                    licenseId: data.licenseId,
+                    licenseType: data.licenseType,
+                    businessName: data.businessName,
+                    holderAddress: data.holderAddress,
+                    issuerAddress: data.issuerAddress,
+                    issueDate: new Date(Number(data.issueDate) * 1000).toISOString(),
+                    expiryDate: new Date(Number(data.expiryDate) * 1000).toISOString(),
+                    status: Number(data.status),
+                    statusString: Number(data.status) === 0 ? 'Active' : (Number(data.status) === 1 ? 'Suspended' : 'Revoked'),
+                    documentHash: data.documentHash,
+                    isValid: Number(data.status) === 0 && (Number(data.expiryDate) * 1000) > Date.now()
+                });
+            } catch (e) {
+                console.error(`Failed to fetch license ${id}:`, e.reason || e.message);
+            }
+        }
+
+        res.json({ licenses });
+
+    } catch (err) {
+        console.error("Get business licenses error:", err.reason || err.message);
+        res.status(500).json({ error: 'Failed to get licenses: ' + (err.reason || err.message) });
+    }
+});
+
+
+// 4. REVOKE LICENSE (Regulator Only)
 router.put('/:licenseId/revoke', [auth, requireRole('regulator')], async (req, res) => {
     try {
         const { licenseId } = req.params;
@@ -117,5 +129,122 @@ router.put('/:licenseId/revoke', [auth, requireRole('regulator')], async (req, r
         res.status(500).json({ error: err.reason || err.message });
     }
 });
+
+
+// 5. SUSPEND LICENSE (Regulator Only)
+router.put('/:licenseId/suspend', [auth, requireRole('regulator')], async (req, res) => {
+    try {
+        const { licenseId } = req.params;
+        const contract = getContract();
+
+        const tx = await contract.suspendLicense(licenseId);
+        await tx.wait();
+
+        res.json({ message: `License ${licenseId} suspended successfully`, txHash: tx.hash });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.reason || err.message });
+    }
+});
+
+
+// 6. REINSTATE LICENSE (Regulator Only)
+router.put('/:licenseId/reinstate', [auth, requireRole('regulator')], async (req, res) => {
+    try {
+        const { licenseId } = req.params;
+        const contract = getContract();
+
+        const tx = await contract.reinstateLicense(licenseId);
+        await tx.wait();
+
+        res.json({ message: `License ${licenseId} reinstated successfully`, txHash: tx.hash });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.reason || err.message });
+    }
+});
+
+
+// ═══════════════════════════════════════════════════════════════
+// ZERO-KNOWLEDGE PROOF (ZKP) ROUTES
+// ═══════════════════════════════════════════════════════════════
+
+// 7. CREATE PRIVACY PROOF (Authenticated user — business or regulator)
+router.post('/zk/create-proof', auth, async (req, res) => {
+    try {
+        const { licenseId } = req.body;
+        if (!licenseId) return res.status(400).json({ error: 'licenseId is required' });
+
+        const contract = getContract();
+        if (!contract) return res.status(500).json({ error: 'Blockchain contract not initialized' });
+
+        // Generate a random nonce to create a unique, unlinkable proof hash
+        const nonce = ethers.hexlify(ethers.randomBytes(32));
+        const proofHash = ethers.keccak256(
+            ethers.AbiCoder.defaultAbiCoder().encode(
+                ['string', 'bytes32'],
+                [licenseId, nonce]
+            )
+        );
+
+        // Proof is valid for 24 hours (86400 seconds)
+        const validFor = 86400;
+
+        console.log(`Creating ZK privacy proof for license ${licenseId}...`);
+        const tx = await contract.createPrivacyProof(licenseId, proofHash, validFor);
+        const receipt = await tx.wait();
+
+        res.status(201).json({
+            message: 'Privacy proof created on-chain. Share only the proofHash — no license data is revealed.',
+            proofHash,
+            nonce,
+            validForSeconds: validFor,
+            txHash: receipt.hash
+        });
+
+    } catch (err) {
+        console.error("ZK proof creation error:", err.reason || err.message);
+        res.status(500).json({ error: 'Failed to create privacy proof: ' + (err.reason || err.message) });
+    }
+});
+
+
+// 8. VERIFY PRIVACY PROOF (Public — anyone can verify)
+router.get('/zk/verify/:proofHash', async (req, res) => {
+    try {
+        const { proofHash } = req.params;
+        const contract = getContract();
+
+        if (!contract) return res.status(500).json({ error: 'Blockchain contract not initialized' });
+
+        const result = await contract.verifyPrivacyProof(proofHash);
+
+        const proofExists = result[0];
+        const isValid = result[1];
+        const licenseType = result[2];
+        const proofValidUntil = Number(result[3]);
+
+        if (!proofExists) {
+            return res.status(404).json({
+                verified: false,
+                message: 'No privacy proof found for this hash.'
+            });
+        }
+
+        res.json({
+            verified: isValid,
+            licenseType: isValid ? licenseType : 'REDACTED',
+            proofExpiry: new Date(proofValidUntil * 1000).toISOString(),
+            message: isValid
+                ? `✅ VERIFIED — This entity holds a valid ${licenseType} license. No further details are disclosed.`
+                : '❌ INVALID — The underlying license is no longer active or the proof has expired.'
+        });
+
+    } catch (err) {
+        console.error("ZK proof verification error:", err.reason || err.message);
+        res.status(500).json({ error: 'Failed to verify privacy proof: ' + (err.reason || err.message) });
+    }
+});
+
 
 export default router;

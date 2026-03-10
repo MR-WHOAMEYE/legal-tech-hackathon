@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Alert, Platform } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import QRCode from 'react-native-qrcode-svg';
 import { fetchLicenseSmart } from '../services/offline';
-import { ShieldCheck, ShieldAlert, KeyRound, Building, Hash, Calendar, FileText, ChevronLeft, Link as LinkIcon } from 'lucide-react-native';
+import { zkApi } from '../services/api';
+import { ShieldCheck, ShieldAlert, KeyRound, Building, Hash, Calendar, FileText, ChevronLeft, Link as LinkIcon, Fingerprint } from 'lucide-react-native';
 
 const LicenseDetailScreen = ({ route, navigation }: any) => {
-    // We might pass licenseId directly, or pass preloaded licenseData from MyLicenses
     const { licenseId, licenseData } = route.params || {};
-
     const [license, setLicense] = useState<any>(licenseData || null);
     const [loading, setLoading] = useState(!licenseData);
     const [error, setError] = useState('');
+    const [zkLoading, setZkLoading] = useState(false);
+    const [zkProof, setZkProof] = useState<string | null>(null);
 
     useEffect(() => {
         if (!licenseData && licenseId) {
@@ -22,11 +24,8 @@ const LicenseDetailScreen = ({ route, navigation }: any) => {
         try {
             setLoading(true);
             const data = await fetchLicenseSmart(id);
-            if (!data) {
-                setError("License could not be verified.");
-            } else {
-                setLicense(data);
-            }
+            if (!data) setError("License could not be verified.");
+            else setLicense(data);
         } catch (e: any) {
             setError(e.message || "Failed to load license");
         } finally {
@@ -34,10 +33,25 @@ const LicenseDetailScreen = ({ route, navigation }: any) => {
         }
     };
 
+    const generateZKProof = async () => {
+        if (!license?.licenseId) return;
+        setZkLoading(true);
+        try {
+            const res = await zkApi.createProof(license.licenseId);
+            setZkProof(res.data.proofHash);
+            Alert.alert("Privacy Proof Created", "A zero-knowledge proof has been minted on-chain. Share the QR below — the verifier will only see validity + license type.");
+        } catch (e: any) {
+            Alert.alert("Error", e.response?.data?.error || e.message || "Failed to create ZK proof");
+        } finally {
+            setZkLoading(false);
+        }
+    };
+
     if (loading) {
         return (
             <View style={styles.center}>
-                <ActivityIndicator size="large" color="#10B981" />
+                <LinearGradient colors={['#0F172A', '#1E293B']} style={StyleSheet.absoluteFill} />
+                <ActivityIndicator size="large" color="#06B6D4" />
                 <Text style={styles.loadingText}>Verifying Blockchain Record...</Text>
             </View>
         );
@@ -46,10 +60,11 @@ const LicenseDetailScreen = ({ route, navigation }: any) => {
     if (error || !license) {
         return (
             <View style={styles.center}>
+                <LinearGradient colors={['#0F172A', '#1E293B']} style={StyleSheet.absoluteFill} />
                 <ShieldAlert size={64} color="#EF4444" />
                 <Text style={styles.errorText}>{error || "License not found"}</Text>
-                <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-                    <Text style={styles.backButtonText}>Go Back</Text>
+                <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+                    <Text style={styles.backBtnText}>Go Back</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -57,73 +72,120 @@ const LicenseDetailScreen = ({ route, navigation }: any) => {
 
     const isActive = license.status === 0;
     const isSuspended = license.status === 1;
-    const ValidationIcon = isActive ? ShieldCheck : ShieldAlert;
-    const statusColor = isActive ? '#10B981' : (isSuspended ? '#F59E0B' : '#EF4444');
+    const StatusIcon = isActive ? ShieldCheck : ShieldAlert;
+    const statusGradient: [string, string] = isActive ? ['#059669', '#10B981'] : (isSuspended ? ['#D97706', '#F59E0B'] : ['#DC2626', '#EF4444']);
 
     return (
-        <ScrollView style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity style={styles.backIconButton} onPress={() => navigation.goBack()}>
-                    <ChevronLeft size={24} color="#1F2937" />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>License Details</Text>
-                <View style={{ width: 24 }} />
-            </View>
-
-            <View style={styles.mainContent}>
-                <View style={styles.statusBox}>
-                    <ValidationIcon size={48} color={statusColor} />
-                    <Text style={[styles.statusTitle, { color: statusColor }]}>
-                        {license.statusString.toUpperCase()}
-                    </Text>
-                    {isActive ? (
-                        <Text style={styles.statusSubtitle}>Verified on blockchain</Text>
-                    ) : (
-                        <Text style={[styles.statusSubtitle, { color: '#EF4444' }]}>Invalid or Revoked</Text>
-                    )}
+        <View style={{ flex: 1 }}>
+            <LinearGradient colors={['#0F172A', '#1E293B', '#0F172A']} style={StyleSheet.absoluteFill} />
+            <ScrollView style={styles.container}>
+                {/* Header */}
+                <View style={styles.header}>
+                    <TouchableOpacity style={styles.backIconBtn} onPress={() => navigation.goBack()}>
+                        <ChevronLeft size={24} color="#94A3B8" />
+                    </TouchableOpacity>
+                    <Text style={styles.headerTitle}>License Details</Text>
+                    <View style={{ width: 40 }} />
                 </View>
 
-                {/* QR Code Section */}
-                <View style={styles.qrContainer}>
-                    <Text style={styles.qrLabel}>Scan to Verify</Text>
-                    <View style={styles.qrFrame}>
-                        <QRCode
-                            value={JSON.stringify({ licenseId: license.licenseId })}
-                            size={160}
-                            color="#111827"
-                            backgroundColor="#FFFFFF"
-                        />
+                <View style={styles.mainContent}>
+                    {/* Status Badge */}
+                    <View style={styles.statusCard}>
+                        <LinearGradient colors={['rgba(255,255,255,0.06)', 'rgba(255,255,255,0.02)']} style={styles.statusGradient}>
+                            <LinearGradient colors={statusGradient} style={styles.statusIconCircle} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                                <StatusIcon size={36} color="#FFFFFF" />
+                            </LinearGradient>
+                            <Text style={[styles.statusTitle, { color: statusGradient[1] }]}>
+                                {license.statusString?.toUpperCase()}
+                            </Text>
+                            <Text style={styles.statusSubtitle}>
+                                {isActive ? 'Verified on blockchain' : 'License is not active'}
+                            </Text>
+                        </LinearGradient>
                     </View>
-                </View>
 
-                {/* Details Section */}
-                <View style={styles.detailsCard}>
-                    <DetailRow icon={<Building />} label="Business Name" value={license.businessName} />
-                    <DetailRow icon={<Hash />} label="License ID" value={license.licenseId} />
-                    <DetailRow icon={<FileText />} label="Type" value={`${license.licenseType} License`} />
-                    <DetailRow icon={<Calendar />} label="Issued On" value={new Date(license.issueDate).toLocaleDateString()} />
-                    <DetailRow icon={<Calendar />} label="Expires On" value={new Date(license.expiryDate).toLocaleDateString()} />
-                    <DetailRow icon={<KeyRound />} label="Issuer" value={`${license.issuerAddress.slice(0, 8)}...${license.issuerAddress.slice(-6)}`} />
-                    
-                    {/* Document Hash */}
-                    <View style={styles.hashSection}>
-                        <View style={styles.hashHeader}>
-                            <LinkIcon size={16} color="#6B7280" />
-                            <Text style={styles.hashLabel}>Document Hash (IPFS/SHA256)</Text>
+                    {/* QR Code */}
+                    <View style={styles.qrCard}>
+                        <LinearGradient colors={['rgba(255,255,255,0.06)', 'rgba(255,255,255,0.02)']} style={styles.qrGradient}>
+                            <Text style={styles.qrLabel}>SCAN TO VERIFY</Text>
+                            <View style={styles.qrFrame}>
+                                <QRCode
+                                    value={JSON.stringify({ licenseId: license.licenseId })}
+                                    size={150}
+                                    color="#0F172A"
+                                    backgroundColor="#FFFFFF"
+                                />
+                            </View>
+                        </LinearGradient>
+                    </View>
+
+                    {/* ZK Privacy Proof */}
+                    <TouchableOpacity onPress={generateZKProof} disabled={zkLoading}>
+                        <LinearGradient 
+                            colors={['#0891B2', '#8B5CF6']}
+                            style={styles.zkButton}
+                            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                        >
+                            {zkLoading ? (
+                                <ActivityIndicator color="#FFFFFF" />
+                            ) : (
+                                <>
+                                    <Fingerprint size={20} color="#FFFFFF" />
+                                    <Text style={styles.zkButtonText}>Generate Privacy Proof (ZKP)</Text>
+                                </>
+                            )}
+                        </LinearGradient>
+                    </TouchableOpacity>
+
+                    {/* ZK Proof QR */}
+                    {zkProof && (
+                        <View style={styles.zkQrCard}>
+                            <LinearGradient colors={['rgba(139,92,246,0.12)', 'rgba(6,182,212,0.05)']} style={styles.zkQrGradient}>
+                                <Text style={styles.zkQrLabel}>🔐 ZERO-KNOWLEDGE PROOF QR</Text>
+                                <Text style={styles.zkQrDesc}>Share this QR — verifier sees ONLY validity + type</Text>
+                                <View style={styles.qrFrame}>
+                                    <QRCode
+                                        value={zkProof}
+                                        size={150}
+                                        color="#4C1D95"
+                                        backgroundColor="#FFFFFF"
+                                    />
+                                </View>
+                                <Text style={styles.zkHashText} selectable>{zkProof}</Text>
+                            </LinearGradient>
                         </View>
-                        <Text selectable style={styles.hashValue}>{license.documentHash}</Text>
+                    )}
+
+                    {/* Details */}
+                    <View style={styles.detailsCard}>
+                        <LinearGradient colors={['rgba(255,255,255,0.06)', 'rgba(255,255,255,0.02)']} style={styles.detailsGradient}>
+                            <DetailRow icon={<Building />} label="Business Name" value={license.businessName} />
+                            <DetailRow icon={<Hash />} label="License ID" value={license.licenseId} />
+                            <DetailRow icon={<FileText />} label="Type" value={`${license.licenseType} License`} />
+                            <DetailRow icon={<Calendar />} label="Issued On" value={new Date(license.issueDate).toLocaleDateString()} />
+                            <DetailRow icon={<Calendar />} label="Expires On" value={new Date(license.expiryDate).toLocaleDateString()} />
+                            <DetailRow icon={<KeyRound />} label="Issuer" value={`${license.issuerAddress.slice(0, 8)}...${license.issuerAddress.slice(-6)}`} />
+
+                            <View style={styles.hashSection}>
+                                <View style={styles.hashHeader}>
+                                    <LinkIcon size={14} color="#64748B" />
+                                    <Text style={styles.hashLabel}>Document Hash (IPFS/SHA256)</Text>
+                                </View>
+                                <Text selectable style={styles.hashValue}>{license.documentHash}</Text>
+                            </View>
+                        </LinearGradient>
                     </View>
                 </View>
-            </View>
-            <View style={{ height: 40 }} />
-        </ScrollView>
+                <View style={{ height: 40 }} />
+            </ScrollView>
+        </View>
     );
 };
 
 const DetailRow = ({ icon, label, value }: { icon: any, label: string, value: string }) => (
     <View style={styles.row}>
         <View style={styles.rowIconBox}>
-            {React.cloneElement(icon, { size: 20, color: '#6B7280' })}
+            {React.cloneElement(icon, { size: 18, color: '#64748B' })}
         </View>
         <View style={styles.rowContent}>
             <Text style={styles.rowLabel}>{label}</Text>
@@ -133,177 +195,97 @@ const DetailRow = ({ icon, label, value }: { icon: any, label: string, value: st
 );
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#F3F4F6',
-    },
+    container: { flex: 1 },
     center: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F3F4F6',
-        padding: 24,
+        flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24,
     },
-    loadingText: {
-        marginTop: 16,
-        fontSize: 16,
-        color: '#4B5563',
-        fontWeight: '500',
-    },
-    errorText: {
-        marginTop: 16,
-        fontSize: 18,
-        color: '#1F2937',
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
-    backButton: {
-        marginTop: 24,
-        backgroundColor: '#E5E7EB',
-        paddingHorizontal: 24,
-        paddingVertical: 12,
-        borderRadius: 8,
-    },
-    backButtonText: {
-        color: '#374151',
-        fontWeight: 'bold',
-        fontSize: 16,
-    },
+    loadingText: { marginTop: 16, fontSize: 15, color: '#94A3B8', fontWeight: '500' },
+    errorText: { marginTop: 16, fontSize: 18, color: '#F1F5F9', fontWeight: 'bold', textAlign: 'center' },
+    backBtn: { marginTop: 24, backgroundColor: 'rgba(255,255,255,0.08)', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 10 },
+    backBtnText: { color: '#94A3B8', fontWeight: 'bold', fontSize: 15 },
     header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: 20,
-        paddingTop: 60,
-        backgroundColor: '#FFFFFF',
-        borderBottomWidth: 1,
-        borderBottomColor: '#E5E7EB',
+        flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+        padding: 20, paddingTop: 60
     },
-    backIconButton: {
-        padding: 4,
+    backIconBtn: {
+        width: 40, height: 40, borderRadius: 12,
+        backgroundColor: 'rgba(255,255,255,0.06)',
+        justifyContent: 'center', alignItems: 'center',
     },
-    headerTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#111827',
+    headerTitle: { fontSize: 18, fontWeight: '800', color: '#F1F5F9' },
+    mainContent: { padding: 20 },
+    statusCard: {
+        borderRadius: 20, overflow: 'hidden', marginBottom: 16,
+        borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
     },
-    mainContent: {
-        padding: 20,
+    statusGradient: { padding: 24, alignItems: 'center' },
+    statusIconCircle: {
+        width: 72, height: 72, borderRadius: 36,
+        justifyContent: 'center', alignItems: 'center', marginBottom: 12,
     },
-    statusBox: {
-        alignItems: 'center',
-        backgroundColor: '#FFFFFF',
-        borderRadius: 16,
-        padding: 24,
-        marginBottom: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 6,
-        elevation: 2,
+    statusTitle: { fontSize: 22, fontWeight: '900', letterSpacing: 2, marginBottom: 4 },
+    statusSubtitle: { fontSize: 13, color: '#64748B' },
+    qrCard: {
+        borderRadius: 20, overflow: 'hidden', marginBottom: 16,
+        borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
     },
-    statusTitle: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginTop: 12,
-        letterSpacing: 1,
-    },
-    statusSubtitle: {
-        fontSize: 14,
-        color: '#6B7280',
-        marginTop: 4,
-    },
-    qrContainer: {
-        alignItems: 'center',
-        backgroundColor: '#FFFFFF',
-        borderRadius: 16,
-        padding: 24,
-        marginBottom: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 6,
-        elevation: 2,
-    },
+    qrGradient: { padding: 24, alignItems: 'center' },
     qrLabel: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        color: '#4B5563',
-        marginBottom: 16,
-        textTransform: 'uppercase',
-        letterSpacing: 1,
+        fontSize: 11, fontWeight: '800', color: '#94A3B8',
+        letterSpacing: 1.5, marginBottom: 16,
     },
     qrFrame: {
-        padding: 16,
-        backgroundColor: '#FFFFFF',
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: '#E5E7EB',
+        padding: 14, backgroundColor: '#FFFFFF', borderRadius: 14,
+    },
+    zkButton: {
+        flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+        borderRadius: 14, paddingVertical: 16, marginBottom: 16, gap: 10,
+    },
+    zkButtonText: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
+    zkQrCard: {
+        borderRadius: 20, overflow: 'hidden', marginBottom: 16,
+        borderWidth: 1, borderColor: 'rgba(139,92,246,0.2)',
+    },
+    zkQrGradient: { padding: 24, alignItems: 'center' },
+    zkQrLabel: {
+        fontSize: 12, fontWeight: '800', color: '#C4B5FD',
+        letterSpacing: 1, marginBottom: 6,
+    },
+    zkQrDesc: { fontSize: 12, color: '#64748B', marginBottom: 16, textAlign: 'center' },
+    zkHashText: {
+        fontSize: 10, color: '#475569', marginTop: 12,
+        fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+        textAlign: 'center',
     },
     detailsCard: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 16,
-        padding: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 6,
-        elevation: 2,
+        borderRadius: 20, overflow: 'hidden',
+        borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
     },
+    detailsGradient: { padding: 20 },
     row: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 16,
-        paddingBottom: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: '#F3F4F6',
+        flexDirection: 'row', alignItems: 'center',
+        marginBottom: 14, paddingBottom: 14,
+        borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)',
     },
     rowIconBox: {
-        width: 40,
-        height: 40,
-        borderRadius: 8,
-        backgroundColor: '#F9FAFB',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 16,
+        width: 38, height: 38, borderRadius: 10,
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        justifyContent: 'center', alignItems: 'center', marginRight: 14,
     },
-    rowContent: {
-        flex: 1,
-    },
-    rowLabel: {
-        fontSize: 13,
-        color: '#6B7280',
-        marginBottom: 2,
-    },
-    rowValue: {
-        fontSize: 15,
-        fontWeight: '600',
-        color: '#1F2937',
-    },
+    rowContent: { flex: 1 },
+    rowLabel: { fontSize: 12, color: '#64748B', marginBottom: 2 },
+    rowValue: { fontSize: 14, fontWeight: '700', color: '#E2E8F0' },
     hashSection: {
-        backgroundColor: '#F9FAFB',
-        padding: 16,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#E5E7EB',
-        marginTop: 8,
+        backgroundColor: 'rgba(0,0,0,0.2)', padding: 16,
+        borderRadius: 12, borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.05)', marginTop: 4,
     },
-    hashHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    hashLabel: {
-        fontSize: 12,
-        fontWeight: 'bold',
-        color: '#4B5563',
-        marginLeft: 6,
-    },
+    hashHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+    hashLabel: { fontSize: 11, fontWeight: '700', color: '#64748B', marginLeft: 6, letterSpacing: 0.5 },
     hashValue: {
-        fontSize: 13,
-        color: '#374151',
+        fontSize: 12, color: '#94A3B8',
         fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-    }
+    },
 });
 
 export default LicenseDetailScreen;

@@ -9,6 +9,8 @@ node_modules/
 artifacts/
 cache/
 typechain-types/
+backend/ignition/deployments/chain-1337/
+
 
 # Build output
 dist/

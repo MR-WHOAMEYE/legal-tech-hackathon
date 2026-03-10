@@ -17,6 +17,7 @@
     "axios": "^1.7.9",
     "expo": "~54.0.0",
     "expo-camera": "~17.0.10",
+    "expo-linear-gradient": "~15.0.8",
     "expo-sqlite": "~16.0.10",
     "expo-status-bar": "~3.0.9",
     "lucide-react-native": "^0.475.0",

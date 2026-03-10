@@ -1,7 +1,8 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, Animated } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { AuthContext } from '../context/AuthContext';
-import { Lock, Mail, Building, UserCircle2 } from 'lucide-react-native';
+import { Lock, Mail, Building, ShieldCheck } from 'lucide-react-native';
 
 const LoginScreen = ({ navigation }: any) => {
     const { login, register, isLoading } = useContext(AuthContext);
@@ -38,220 +39,237 @@ const LoginScreen = ({ navigation }: any) => {
         }
     };
 
+    const roleOptions = [
+        { key: 'verifier' as const, label: 'Verifier', icon: '🔍' },
+        { key: 'business' as const, label: 'Business', icon: '🏢' },
+        { key: 'regulator' as const, label: 'Regulator', icon: '🏛️' },
+    ];
+
     return (
-        <KeyboardAvoidingView 
-            style={styles.container}
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        >
-            <ScrollView contentContainerStyle={styles.scrollContent}>
-                <View style={styles.header}>
-                    <Lock size={64} color="#2563EB" style={styles.icon} />
-                    <Text style={styles.title}>TrustPass Verify</Text>
-                    <Text style={styles.subtitle}>Blockchain Business Licensing</Text>
-                </View>
-
-                <View style={styles.formContainer}>
-                    <View style={styles.inputGroup}>
-                        <Mail color="#6B7280" size={20} style={styles.inputIcon} />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Email Address"
-                            placeholderTextColor="#9CA3AF"
-                            value={email}
-                            onChangeText={setEmail}
-                            autoCapitalize="none"
-                            keyboardType="email-address"
-                        />
-                    </View>
-
-                    <View style={styles.inputGroup}>
-                        <Lock color="#6B7280" size={20} style={styles.inputIcon} />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Password"
-                            placeholderTextColor="#9CA3AF"
-                            secureTextEntry
-                            value={password}
-                            onChangeText={setPassword}
-                        />
-                    </View>
-
-                    {!isLogin && (
-                        <View style={styles.roleContainer}>
-                            <Text style={styles.label}>Select your role:</Text>
-                            <View style={styles.roleButtons}>
-                                {(["verifier", "business", "regulator"] as const).map(r => (
-                                    <TouchableOpacity 
-                                        key={r}
-                                        style={[styles.roleButton, role === r && styles.roleButtonActive]}
-                                        onPress={() => setRole(r)}
-                                    >
-                                        <Text style={[styles.roleText, role === r && styles.roleTextActive]}>
-                                            {r.charAt(0).toUpperCase() + r.slice(1)}
-                                        </Text>
-                                    </TouchableOpacity>
-                                ))}
+        <View style={styles.container}>
+            <LinearGradient colors={['#0F172A', '#1E293B', '#0F172A']} style={StyleSheet.absoluteFill} />
+            
+            <KeyboardAvoidingView 
+                style={{ flex: 1 }}
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            >
+                <ScrollView contentContainerStyle={styles.scrollContent}>
+                    {/* Brand Header */}
+                    <View style={styles.header}>
+                        <View style={styles.logoContainer}>
+                            <LinearGradient 
+                                colors={['#06B6D4', '#8B5CF6']}
+                                style={styles.logoGradient}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 1 }}
+                            >
+                                <ShieldCheck size={36} color="#FFFFFF" />
+                            </LinearGradient>
+                        </View>
+                        <Text style={styles.brandName}>TrustPass</Text>
+                        <Text style={styles.tagline}>Blockchain License Verification</Text>
+                        <View style={styles.tagRow}>
+                            <View style={styles.tag}>
+                                <Text style={styles.tagText}>🔗 On-Chain</Text>
+                            </View>
+                            <View style={styles.tag}>
+                                <Text style={styles.tagText}>🔐 ZK-Proof</Text>
+                            </View>
+                            <View style={styles.tag}>
+                                <Text style={styles.tagText}>📱 Offline</Text>
                             </View>
                         </View>
-                    )}
+                    </View>
 
-                    {!isLogin && role === 'business' && (
-                        <View style={styles.inputGroup}>
-                            <Building color="#6B7280" size={20} style={styles.inputIcon} />
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Business Name"
-                                placeholderTextColor="#9CA3AF"
-                                value={businessName}
-                                onChangeText={setBusinessName}
-                            />
-                        </View>
-                    )}
-
-                    <TouchableOpacity 
-                        style={styles.submitButton} 
-                        onPress={handleSubmit}
-                        disabled={isLoading}
-                    >
-                        {isLoading ? (
-                            <ActivityIndicator color="#FFFFFF" />
-                        ) : (
-                            <Text style={styles.submitText}>
-                                {isLogin ? 'Sign In Securely' : 'Create Account'}
+                    {/* Form Card */}
+                    <View style={styles.formCard}>
+                        <LinearGradient 
+                            colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.02)']}
+                            style={styles.formGradient}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 0, y: 1 }}
+                        >
+                            <Text style={styles.formTitle}>
+                                {isLogin ? 'Welcome Back' : 'Create Account'}
                             </Text>
-                        )}
-                    </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => setIsLogin(!isLogin)} style={styles.switchButton}>
-                        <Text style={styles.switchText}>
-                            {isLogin ? "Don't have an account? Sign up" : "Already have an account? Log in"}
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-            </ScrollView>
-        </KeyboardAvoidingView>
+                            {/* Email */}
+                            <View style={styles.inputGroup}>
+                                <Mail color="#8B5CF6" size={20} style={styles.inputIcon} />
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Email Address"
+                                    placeholderTextColor="#475569"
+                                    value={email}
+                                    onChangeText={setEmail}
+                                    autoCapitalize="none"
+                                    keyboardType="email-address"
+                                />
+                            </View>
+
+                            {/* Password */}
+                            <View style={styles.inputGroup}>
+                                <Lock color="#8B5CF6" size={20} style={styles.inputIcon} />
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Password"
+                                    placeholderTextColor="#475569"
+                                    secureTextEntry
+                                    value={password}
+                                    onChangeText={setPassword}
+                                />
+                            </View>
+
+                            {/* Role Selection (Register only) */}
+                            {!isLogin && (
+                                <View style={styles.roleSection}>
+                                    <Text style={styles.roleLabel}>SELECT YOUR ROLE</Text>
+                                    <View style={styles.roleButtons}>
+                                        {roleOptions.map(r => (
+                                            <TouchableOpacity 
+                                                key={r.key}
+                                                style={[styles.roleButton, role === r.key && styles.roleButtonActive]}
+                                                onPress={() => setRole(r.key)}
+                                            >
+                                                <Text style={styles.roleEmoji}>{r.icon}</Text>
+                                                <Text style={[styles.roleText, role === r.key && styles.roleTextActive]}>
+                                                    {r.label}
+                                                </Text>
+                                            </TouchableOpacity>
+                                        ))}
+                                    </View>
+                                </View>
+                            )}
+
+                            {/* Business Name (register + business role) */}
+                            {!isLogin && role === 'business' && (
+                                <View style={styles.inputGroup}>
+                                    <Building color="#8B5CF6" size={20} style={styles.inputIcon} />
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Business Name"
+                                        placeholderTextColor="#475569"
+                                        value={businessName}
+                                        onChangeText={setBusinessName}
+                                    />
+                                </View>
+                            )}
+
+                            {/* Submit */}
+                            <TouchableOpacity onPress={handleSubmit} disabled={isLoading} activeOpacity={0.8}>
+                                <LinearGradient 
+                                    colors={['#06B6D4', '#8B5CF6']}
+                                    style={styles.submitButton}
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 0 }}
+                                >
+                                    {isLoading ? (
+                                        <ActivityIndicator color="#FFFFFF" />
+                                    ) : (
+                                        <Text style={styles.submitText}>
+                                            {isLogin ? 'Sign In Securely' : 'Create Account'}
+                                        </Text>
+                                    )}
+                                </LinearGradient>
+                            </TouchableOpacity>
+
+                            {/* Switch */}
+                            <TouchableOpacity onPress={() => setIsLogin(!isLogin)} style={styles.switchButton}>
+                                <Text style={styles.switchText}>
+                                    {isLogin ? "Don't have an account? " : "Already have an account? "}
+                                    <Text style={styles.switchHighlight}>
+                                        {isLogin ? 'Sign up' : 'Log in'}
+                                    </Text>
+                                </Text>
+                            </TouchableOpacity>
+                        </LinearGradient>
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#001621',
-    },
+    container: { flex: 1 },
     scrollContent: {
-        flexGrow: 1,
-        justifyContent: 'center',
-        padding: 24,
+        flexGrow: 1, justifyContent: 'center', padding: 24,
     },
-    header: {
-        alignItems: 'center',
-        marginBottom: 40,
+    header: { alignItems: 'center', marginBottom: 36 },
+    logoContainer: { marginBottom: 16 },
+    logoGradient: {
+        width: 72, height: 72, borderRadius: 20,
+        justifyContent: 'center', alignItems: 'center',
+        shadowColor: '#06B6D4', shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.4, shadowRadius: 16,
     },
-    icon: {
-        marginBottom: 16,
+    brandName: {
+        fontSize: 36, fontWeight: '900', color: '#F1F5F9',
+        letterSpacing: -1,
     },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#1F2937',
-        marginBottom: 8,
+    tagline: {
+        fontSize: 14, color: '#64748B', marginTop: 4, letterSpacing: 0.5,
     },
-    subtitle: {
-        fontSize: 16,
-        color: '#6B7280',
+    tagRow: { flexDirection: 'row', marginTop: 16, gap: 8 },
+    tag: {
+        backgroundColor: 'rgba(255,255,255,0.06)',
+        paddingHorizontal: 12, paddingVertical: 6,
+        borderRadius: 20, borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.08)',
     },
-    formContainer: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 16,
-        padding: 24,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
-        elevation: 3,
+    tagText: { fontSize: 11, color: '#94A3B8', fontWeight: '600' },
+
+    formCard: {
+        borderRadius: 24, overflow: 'hidden',
+        borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    },
+    formGradient: { padding: 28 },
+    formTitle: {
+        fontSize: 22, fontWeight: '800', color: '#E2E8F0',
+        marginBottom: 24,
     },
     inputGroup: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#F9FAFB',
-        borderWidth: 1,
-        borderColor: '#E5E7EB',
-        borderRadius: 8,
-        marginBottom: 16,
-        paddingHorizontal: 12,
-        height: 50,
+        flexDirection: 'row', alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        borderWidth: 1, borderColor: 'rgba(139,92,246,0.15)',
+        borderRadius: 14, marginBottom: 14,
+        paddingHorizontal: 14, height: 54,
     },
-    inputIcon: {
-        marginRight: 10,
-    },
+    inputIcon: { marginRight: 12 },
     input: {
-        flex: 1,
-        height: '100%',
-        color: '#1F2937',
-        fontSize: 16,
+        flex: 1, height: '100%', color: '#E2E8F0', fontSize: 15,
     },
-    roleContainer: {
-        marginBottom: 16,
+    roleSection: { marginBottom: 16 },
+    roleLabel: {
+        fontSize: 11, fontWeight: '700', color: '#94A3B8',
+        letterSpacing: 1.5, marginBottom: 10,
     },
-    label: {
-        fontSize: 14,
-        color: '#4B5563',
-        marginBottom: 8,
-        fontWeight: '500',
-    },
-    roleButtons: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
+    roleButtons: { flexDirection: 'row', gap: 8 },
     roleButton: {
-        flex: 1,
-        paddingVertical: 10,
-        marginHorizontal: 4,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#E5E7EB',
+        flex: 1, paddingVertical: 12,
+        borderRadius: 12, borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.08)',
         alignItems: 'center',
-        backgroundColor: '#F9FAFB',
+        backgroundColor: 'rgba(0,0,0,0.2)',
     },
     roleButtonActive: {
-        backgroundColor: '#EFF6FF',
-        borderColor: '#3B82F6',
+        backgroundColor: 'rgba(139,92,246,0.15)',
+        borderColor: '#8B5CF6',
     },
-    roleText: {
-        fontSize: 13,
-        color: '#6B7280',
-        fontWeight: '500',
-    },
-    roleTextActive: {
-        color: '#2563EB',
-        fontWeight: 'bold',
-    },
+    roleEmoji: { fontSize: 20, marginBottom: 4 },
+    roleText: { fontSize: 12, color: '#64748B', fontWeight: '600' },
+    roleTextActive: { color: '#C4B5FD' },
     submitButton: {
-        backgroundColor: '#001621',
-        borderRadius: 8,
-        height: 50,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-        elevation: 4,
+        borderRadius: 14, height: 54,
+        justifyContent: 'center', alignItems: 'center',
+        marginTop: 4,
     },
     submitText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: 'bold',
+        color: '#FFFFFF', fontSize: 16, fontWeight: '700', letterSpacing: 0.3,
     },
-    switchButton: {
-        marginTop: 20,
-        alignItems: 'center',
-    },
-    switchText: {
-        color: '#4B5563',
-        fontSize: 14,
-    }
+    switchButton: { marginTop: 20, alignItems: 'center' },
+    switchText: { color: '#64748B', fontSize: 14 },
+    switchHighlight: { color: '#06B6D4', fontWeight: '700' },
 });
 
 export default LoginScreen;

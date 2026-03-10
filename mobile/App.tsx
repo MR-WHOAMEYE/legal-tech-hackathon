@@ -11,6 +11,8 @@ import RegisterLicenseScreen from './src/screens/RegisterLicenseScreen';
 import ScanScreen from './src/screens/ScanScreen';
 import LicenseDetailScreen from './src/screens/LicenseDetailScreen';
 import SearchLicenseScreen from './src/screens/SearchLicenseScreen';
+import ZKVerifyScreen from './src/screens/ZKVerifyScreen';
+import ZKResultScreen from './src/screens/ZKResultScreen';
 
 import { ActivityIndicator, View } from 'react-native';
 
@@ -21,8 +23,8 @@ const AppNavigator = () => {
 
     if (isLoading) {
         return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <ActivityIndicator size="large" color="#2563EB" />
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0F172A' }}>
+                <ActivityIndicator size="large" color="#06B6D4" />
             </View>
         );
     }
@@ -31,10 +33,8 @@ const AppNavigator = () => {
         <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
                 {!token ? (
-                    // Auth Stack
                     <Stack.Screen name="Login" component={LoginScreen} />
                 ) : (
-                    // App Stack
                     <>
                         <Stack.Screen name="Dashboard" component={DashboardScreen} />
                         <Stack.Screen name="MyLicenses" component={MyLicensesScreen} options={{ headerShown: true, title: 'My Licenses' }} />
@@ -42,6 +42,8 @@ const AppNavigator = () => {
                         <Stack.Screen name="Scan" component={ScanScreen} />
                         <Stack.Screen name="SearchLicense" component={SearchLicenseScreen} />
                         <Stack.Screen name="LicenseDetail" component={LicenseDetailScreen} />
+                        <Stack.Screen name="ZKVerify" component={ZKVerifyScreen} />
+                        <Stack.Screen name="ZKResult" component={ZKResultScreen} />
                     </>
                 )}
             </Stack.Navigator>

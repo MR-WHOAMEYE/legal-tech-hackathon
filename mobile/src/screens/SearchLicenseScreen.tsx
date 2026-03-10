@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { Search, Hash } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Search, Hash, ChevronLeft } from 'lucide-react-native';
 
 const SearchLicenseScreen = ({ navigation }: any) => {
     const [licenseId, setLicenseId] = useState('');
@@ -11,9 +12,7 @@ const SearchLicenseScreen = ({ navigation }: any) => {
             Alert.alert("Error", "Please enter a valid License ID");
             return;
         }
-
         setIsLoading(true);
-        // Add a tiny delay for UX so it doesn't instantly snap
         setTimeout(() => {
             setIsLoading(false);
             navigation.navigate('LicenseDetail', { licenseId: licenseId.trim() });
@@ -21,164 +20,111 @@ const SearchLicenseScreen = ({ navigation }: any) => {
     };
 
     return (
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.container}>
-            <ScrollView contentContainerStyle={styles.scrollContent}>
-                <View style={styles.header}>
-                    <View style={styles.iconCircle}>
-                        <Search size={48} color="#3B82F6" />
-                    </View>
-                    <Text style={styles.title}>Search License</Text>
-                    <Text style={styles.subtitle}>Manually verify a license by ID</Text>
-                </View>
-
-                <View style={styles.formContainer}>
-                    <Text style={styles.label}>License ID</Text>
-                    <View style={styles.inputGroup}>
-                        <Hash color="#6B7280" size={20} style={styles.inputIcon} />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="e.g. GST-12345"
-                            placeholderTextColor="#9CA3AF"
-                            value={licenseId}
-                            onChangeText={setLicenseId}
-                            autoCapitalize="characters"
-                            returnKeyType="search"
-                            onSubmitEditing={handleSearch}
-                        />
-                    </View>
-
-                    <TouchableOpacity 
-                        style={styles.submitButton} 
-                        onPress={handleSearch}
-                        disabled={isLoading}
-                    >
-                        {isLoading ? (
-                            <ActivityIndicator color="#FFFFFF" />
-                        ) : (
-                            <Text style={styles.submitText}>Search Blockchain</Text>
-                        )}
+        <View style={styles.container}>
+            <LinearGradient colors={['#0F172A', '#1E293B', '#0F172A']} style={StyleSheet.absoluteFill} />
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+                <ScrollView contentContainerStyle={styles.scrollContent}>
+                    <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                        <ChevronLeft size={24} color="#94A3B8" />
                     </TouchableOpacity>
-                </View>
 
-                <View style={styles.helpBox}>
-                    <Text style={styles.helpTitle}>How it works?</Text>
-                    <Text style={styles.helpText}>
-                        This search queries the blockchain securely to verify that the license exists, is authentic, and has not been revoked or suspended.
-                    </Text>
-                </View>
-            </ScrollView>
-        </KeyboardAvoidingView>
+                    <View style={styles.header}>
+                        <LinearGradient colors={['#2563EB', '#3B82F6']} style={styles.iconCircle} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                            <Search size={36} color="#FFFFFF" />
+                        </LinearGradient>
+                        <Text style={styles.title}>Search License</Text>
+                        <Text style={styles.subtitle}>Verify a license by its ID on the blockchain</Text>
+                    </View>
+
+                    <View style={styles.formCard}>
+                        <LinearGradient colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.02)']} style={styles.formGradient}>
+                            <Text style={styles.label}>LICENSE ID</Text>
+                            <View style={styles.inputGroup}>
+                                <Hash color="#3B82F6" size={20} style={styles.inputIcon} />
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="e.g. GST-12345"
+                                    placeholderTextColor="#475569"
+                                    value={licenseId}
+                                    onChangeText={setLicenseId}
+                                    autoCapitalize="characters"
+                                    returnKeyType="search"
+                                    onSubmitEditing={handleSearch}
+                                />
+                            </View>
+
+                            <TouchableOpacity onPress={handleSearch} disabled={isLoading} activeOpacity={0.8}>
+                                <LinearGradient colors={['#2563EB', '#3B82F6']} style={styles.submitButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                                    {isLoading ? (
+                                        <ActivityIndicator color="#FFFFFF" />
+                                    ) : (
+                                        <Text style={styles.submitText}>Search Blockchain</Text>
+                                    )}
+                                </LinearGradient>
+                            </TouchableOpacity>
+                        </LinearGradient>
+                    </View>
+
+                    <View style={styles.helpCard}>
+                        <LinearGradient colors={['rgba(37,99,235,0.1)', 'rgba(37,99,235,0.03)']} style={styles.helpGradient}>
+                            <Text style={styles.helpTitle}>🔗 How it works</Text>
+                            <Text style={styles.helpText}>
+                                This search queries the blockchain securely to verify that the license exists, is authentic, and has not been revoked or suspended. Results are fetched directly from the smart contract.
+                            </Text>
+                        </LinearGradient>
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#F3F4F6',
+    container: { flex: 1 },
+    scrollContent: { flexGrow: 1, padding: 24, paddingTop: 60 },
+    backButton: {
+        width: 40, height: 40, borderRadius: 12,
+        backgroundColor: 'rgba(255,255,255,0.06)',
+        justifyContent: 'center', alignItems: 'center', marginBottom: 20,
     },
-    scrollContent: {
-        flexGrow: 1,
-        padding: 24,
-        paddingTop: 60,
-    },
-    header: {
-        alignItems: 'center',
-        marginBottom: 32,
-    },
+    header: { alignItems: 'center', marginBottom: 32 },
     iconCircle: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        backgroundColor: '#EFF6FF',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 16,
+        width: 80, height: 80, borderRadius: 24,
+        justifyContent: 'center', alignItems: 'center', marginBottom: 16,
     },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#111827',
-        marginBottom: 8,
+    title: { fontSize: 28, fontWeight: '800', color: '#F1F5F9', letterSpacing: -0.3 },
+    subtitle: { fontSize: 14, color: '#64748B', marginTop: 6, textAlign: 'center' },
+    formCard: {
+        borderRadius: 20, overflow: 'hidden', marginBottom: 20,
+        borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
     },
-    subtitle: {
-        fontSize: 16,
-        color: '#6B7280',
-    },
-    formContainer: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 16,
-        padding: 24,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
-        elevation: 3,
-        marginBottom: 24,
-    },
+    formGradient: { padding: 24 },
     label: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        color: '#374151',
-        marginBottom: 8,
-        textTransform: 'uppercase',
-        letterSpacing: 1,
+        fontSize: 11, fontWeight: '700', color: '#94A3B8',
+        letterSpacing: 1.5, marginBottom: 10,
     },
     inputGroup: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#F9FAFB',
-        borderWidth: 1,
-        borderColor: '#E5E7EB',
-        borderRadius: 8,
-        marginBottom: 20,
-        paddingHorizontal: 12,
-        height: 54,
+        flexDirection: 'row', alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        borderWidth: 1, borderColor: 'rgba(59,130,246,0.2)',
+        borderRadius: 12, marginBottom: 20, paddingHorizontal: 14, height: 56,
     },
-    inputIcon: {
-        marginRight: 10,
-    },
+    inputIcon: { marginRight: 10 },
     input: {
-        flex: 1,
-        height: '100%',
-        color: '#1F2937',
-        fontSize: 16,
-        fontWeight: '600',
+        flex: 1, height: '100%', color: '#E2E8F0',
+        fontSize: 16, fontWeight: '600',
     },
     submitButton: {
-        backgroundColor: '#3B82F6',
-        borderRadius: 8,
-        height: 52,
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#3B82F6',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-        elevation: 4,
+        borderRadius: 14, height: 54, justifyContent: 'center', alignItems: 'center',
     },
-    submitText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: 'bold',
+    submitText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
+    helpCard: {
+        borderRadius: 16, overflow: 'hidden',
+        borderWidth: 1, borderColor: 'rgba(37,99,235,0.15)',
     },
-    helpBox: {
-        backgroundColor: '#EFF6FF',
-        padding: 20,
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: '#BFDBFE',
-    },
-    helpTitle: {
-        fontSize: 15,
-        fontWeight: 'bold',
-        color: '#1E3A8A',
-        marginBottom: 8,
-    },
-    helpText: {
-        fontSize: 14,
-        color: '#1E40AF',
-        lineHeight: 20,
-    }
+    helpGradient: { padding: 20 },
+    helpTitle: { fontSize: 15, fontWeight: '700', color: '#93C5FD', marginBottom: 8 },
+    helpText: { fontSize: 13, color: '#64748B', lineHeight: 20 },
 });
 
 export default SearchLicenseScreen;
