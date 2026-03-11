@@ -241,7 +241,7 @@ const PendingApprovalsScreen = ({ navigation }: any) => {
                             )}
 
                             <TouchableOpacity style={styles.modalConfirmBtn} onPress={submitApproval}>
-                                <LinearGradient colors={['#cc3200', '#ff4103']} style={StyleSheet.absoluteFillObject} borderRadius={12} />
+                                <LinearGradient colors={['#cc3200', '#ff4103']} style={[StyleSheet.absoluteFillObject, { borderRadius: 12 }]} />
                                 <Text style={styles.modalConfirmText}>Confirm & Mint to Blockchain</Text>
                             </TouchableOpacity>
                         </View>

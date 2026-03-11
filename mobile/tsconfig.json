@@ -9,7 +9,7 @@
     "jsx": "react-native",
     "strict": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "resolveJsonModule": true,
