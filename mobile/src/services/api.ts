@@ -4,7 +4,8 @@ import { Platform } from 'react-native';
 
 const getBaseUrl = () => {
     // Use localhost for local development, change to your actual IP for device testing
-    return 'http://10.10.9.226:3001/api';
+    return 'https://legal-tech-hackathon.vercel.app/api';
+    //return 'http://10.10.9.226:3001/api';
 };
 
 const API_URL = getBaseUrl();
