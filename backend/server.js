@@ -46,7 +46,7 @@ app.get('/health', (req, res) => {
 // Database and Blockchain Connection
 mongoose.connect(MONGODB_URI)
     .then(() => {
-        console.log('MongoDB connected to', MONGODB_URI);
+        console.log('MongoDB connected successfully');
     })
     .catch(err => {
         console.error('MongoDB connection error:', err);

@@ -27,7 +27,7 @@ function initBlockchain() {
 
             if (contractAddress) {
                 contract = new ethers.Contract(contractAddress, artifact.abi, wallet);
-                console.log("Blockchain initialized with contract:", contractAddress);
+                console.log("Blockchain initialized successfully");
             } else {
                 console.log("Warning: No CONTRACT_ADDRESS provided in .env yet.");
                 contract = new ethers.Contract(ethers.ZeroAddress, artifact.abi, wallet); // dummy setup
